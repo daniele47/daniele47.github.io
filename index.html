@@ -73,13 +73,21 @@
     <div class="links" id="links"></div>
 
     <script>
-        [
+        const link = document.createElement('link')
+        link.rel = 'icon'
+        link.type = 'image/png'
+        link.href = "https://upload.wikimedia.org/wikipedia/commons/3/37/Internet_icon.png"
+        document.head.appendChild(link)
+
+        const data = [
             {
                 "name" : "Streams",
                 "url": "./streams",
                 "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Acquisition_%28video%29.png"
             }
-        ].forEach(item => {
+        ]
+
+        data.forEach(item => {
             const container = document.getElementById('links');
             const link = document.createElement('a');
             link.href = item.url;
