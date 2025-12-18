@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>TV Stream</title>
+    <style>
+        /* --- Global Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #0c0c0f;
+            color: #e6e6e6;
+            font-family: system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        /* --- Stream List Grid --- */
+        #stream-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 14px;
+        }
+        /* List items - subtle hover with vertical lift */
+        #stream-list a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: #1a1a21;
+            padding: 14px 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #e6e6e6;
+            border: 1px solid #2a2a33;
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        }
+        #stream-list a:hover {
+            background: #24242b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+        }
+        #stream-list img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+            transition: transform 0.15s ease;
+        }
+        #stream-list a:hover img {
+            transform: translateY(-3px);
+        }
+        /* --- Home Button --- */
+        #home-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a21;
+            border-bottom: 1px solid #2a2a33;
+            height: 50px;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+        /* Make the <a> fill the full button area */
+        #home-button a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            gap: 8px;
+            text-decoration: none;
+            color: #e6e6e6;
+            font-size: 16px;
+            transition: color 0.2s ease;
+        }
+        #home-button:hover {
+            background: #24242b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        #home-button img {
+            width: 26px;
+            height: 26px;
+        }
+        /* --- Video Layout --- */
+        body:has(#stream-video:not([style*="display: none"])) {
+            flex-direction: column;
+        }
+        #stream-video {
+            width: 100%;
+            height: calc(100vh - 50px - 32px);
+            background: black;
+            object-fit: contain;
+            display: block;
+        }
+        /* --- Footer --- */
+        #site-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 10px 0;
+            background: #0c0c0f;
+            border-top: 1px solid #1a1a21;
+            margin-top: auto; /* pushes footer to bottom without stretching content */
+        }
+        /* --- Debug Button --- */
+        #debug-button {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            background: #1a1a21;
+            border: 1px solid #3a3a4a;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 2px 6px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        /* Style the image inside the button */
+        #debug-button-icon {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            filter: brightness(0.8) saturate(1.2);
+            transition: filter 0.25s ease;
+        }
+        #debug-button:hover {
+            background: #24242b;
+            border-color: #4a4a5a;
+            box-shadow: 
+                0 4px 12px rgba(138, 138, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px) scale(1.05);
+        }
+        #debug-button:hover #debug-button-icon {
+            filter: brightness(1) saturate(1.5);
+        }
+        #debug-button:active {
+            transform: translateY(0) scale(1);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        /* --- Smooth Fade --- */
+        #stream-list,
+        #home-button,
+        #stream-video {
+            transition: opacity 0.25s ease;
+        }
+        [style*="display: none"] {
+            opacity: 0;
+        }
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+    </style> 
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+
+<body>
+    <script>
+        function run_stream(url, video) {
+            // Add shortcuts when stream starts
+            function handleKeydown(e) {
+                // Don't trigger if user is typing in an input field
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                switch(e.key) {
+                    case 'f':
+                        // Toggle fullscreen
+                        if (!document.fullscreenElement) {
+                            video.requestFullscreen().catch(err => console.error(err));
+                        } else {
+                            document.exitFullscreen();
+                        }
+                        break;
+                    case 'm':
+                        // Toggle mute
+                        video.muted = !video.muted;
+                        break;
+                    case 'k':
+                        // Play/pause
+                        video.paused ? video.play() : video.pause();
+                        break;
+                    case 'j':
+                        // Seek -5 seconds
+                        video.currentTime = Math.max(0, video.currentTime - 5);
+                        break;
+                    case 'l':
+                        // Seek +5 seconds
+                        video.currentTime = Math.min(video.duration, video.currentTime + 5);
+                        break;
+                }
+            }
+            // Store the handler on video for cleanup
+            video._keydownHandler = handleKeydown;
+            document.addEventListener('keydown', video._keydownHandler);
+            // Rest of your stream logic
+            if (Hls.isSupported()) {
+                var hls = new Hls();
+                video.hls = hls;
+                hls.loadSource(url);
+                hls.attachMedia(video);
+            }
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+            } else {
+                alert("Your browser doesn't support HLS streaming.");
+            }
+        }
+        function stop_stream(video) {
+            // Remove ALL shortcuts at once
+            if (video._keydownHandler) {
+                document.removeEventListener('keydown', video._keydownHandler);
+                video._keydownHandler = null;
+            }
+            // Rest of cleanup...
+            if (video.hls) {
+                video.hls.destroy();
+                video.hls = null;
+            }
+            video.load();
+            video.pause();
+        }
+        function set_display(elements, displayState) {
+            elements.forEach(elem => {
+                if (elem) elem.style.display = displayState;
+            });
+        }
+    </script>
+
+    <div id="stream-list" style="display:none"></div>
+    <div id="home-button" style="display:none"><a href="#"><img id="home-button-icon">Home</a></div>
+    <video id="stream-video" style="display:none" width="100%" controls></video>
+    <footer id="site-footer" style="display:none">© TV Stream • Click a channel to start streaming • Built with HLS.js</footer>
+    <a id="debug-button" href="/debug.html" style="display: none"><img id="debug-button-icon"></img></a>
+
+    <script>
+        fetch("./api/config.json")
+            .then(response => response.json())
+            .then(config_data => {
+                const video_icon = config_data.icon.video
+                const gear_icon = config_data.icon.gear
+                console.log(video_icon, gear_icon)
+                document.getElementById("home-button-icon").setAttribute("src", video_icon)
+                document.getElementById("debug-button-icon").setAttribute("src", gear_icon)
+                const link = document.createElement('link')
+                link.rel = 'icon'
+                link.type = 'image/png'
+                link.href = video_icon
+                document.head.appendChild(link)
+            })
+    </script>
+
+    <script>
+        fetch("./api/channels.json")
+            .then(response => response.json())
+            .then(channel_data => {
+                const home_button = document.getElementById("home-button")
+                const stream_list = document.getElementById("stream-list")
+                const stream_video = document.getElementById("stream-video")
+                const site_footer = document.getElementById("site-footer")
+                const debug_button = document.getElementById("debug-button")
+
+                const footer_tips = [
+                    "Press F to fullscreen the streaming",
+                    "Press M to mute/unmute",
+                    "Press K to play/pause",
+                    "Press J to move backward",
+                    "Press L to move forward",
+                    "Click the video to play/pause",
+                    "Refresh if a channel freezes",
+                    "Some streams may take a moment to load",
+                    "Click Home button to return to the channel list",
+                ]
+
+                // initialize stream list
+                let html_string = '';
+                for (const channel of channel_data) {
+                    html_string += `<a href="#${channel.id}"><img src="${channel.icon}">${channel.name}</a>`
+                }
+                stream_list.innerHTML = html_string
+
+                // change page based on the fragment
+                window.addEventListener('hashchange', function() {
+                    const searched_channel_id = window.location.hash.replace(/^#/, '');
+                    const channel = channel_data.find(c => c.id === searched_channel_id);
+                    if (!channel) { 
+                        // home
+                        set_display([stream_list, site_footer, debug_button], "")
+                        set_display([home_button, stream_video], "none")
+                        document.title = "TV Stream"
+                        site_footer.innerText = "© TV Stream • Click a channel to start streaming"
+                        history.replaceState(null, '', window.location.pathname);
+                        stop_stream(stream_video)
+                    } else { 
+                        // valid channel -> render video
+                        set_display([stream_list], "none")
+                        set_display([home_button, stream_video, site_footer, debug_button], "")
+                        site_footer.innerText = `© ${channel.name} Stream • ${footer_tips[Math.floor(Math.random() * footer_tips.length)]}`
+                        document.title = channel.name + " Stream"
+                        history.replaceState(null, '', window.location.pathname + window.location.hash);
+                        run_stream(channel.url, stream_video)
+                    }
+                });
+
+                // force hashchange event to start at page load
+                window.dispatchEvent(new HashChangeEvent('hashchange'));
+            })
+    </script>
+</body>

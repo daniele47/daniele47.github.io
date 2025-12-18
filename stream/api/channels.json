@@ -1,0 +1,140 @@
+[
+    {
+        "id": "rai1",
+        "name": "Rai 1",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/rai1/browser-HLS8/rai1.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Rai_1_-_Logo_2016.svg"
+    },
+    {
+        "id": "rai2",
+        "name": "Rai 2",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/rai2/browser-HLS8/rai2.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/9/99/Rai_2_-_Logo_2016.svg"
+    },
+    {
+        "id": "rai3",
+        "name": "Rai 3",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/rai3/browser-HLS8/rai3.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/4/47/Rai_3_-_Logo_2016.svg"
+    },
+    {
+        "id": "rete4",
+        "name": "Rete 4",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-r4/r4-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Rete_4_-_Logo_2018.svg"
+    },
+    {
+        "id": "canale5",
+        "name": "Canale 5",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-c5/c5-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/0/02/Canale_5_-_2018_logo.svg"
+    },
+    {
+        "id": "italia1",
+        "name": "Italia 1",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-i1/i1-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Italia_1_logo.svg"
+    },
+    {
+        "id": "la7",
+        "name": "La 7",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/la7/browser-HLS8/la7.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/0/02/LA7_-_Logo_2011.svg"
+    },
+    {
+        "id": "nove",
+        "name": "Nove",
+        "url": "https://d31mw7o1gs0dap.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-y5pbi2sq9r609/NOVE_IT.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Nove_-_Logo_2017.svg"
+    },
+    {
+        "id": "mediaset20",
+        "name": "Mediaset 20",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-lb/lb-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/5/5c/20_Mediaset_2018.svg"
+    },
+    {
+        "id": "iris",
+        "name": "Iris",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-ki/ki-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/9/98/Iris_logo_2013.svg"
+    },
+    {
+        "id": "27",
+        "name": "27",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-ts/ts-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/2/26/Twentyseven_logo.svg"
+    },
+    {
+        "id": "la7d",
+        "name": "La7d",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/la7d/browser-HLS8/la7d.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8b/LA7d_%282024%29.svg"
+    },
+    {
+        "id": "realtime",
+        "name": "Real Time",
+        "url": "https://d3562mgijzx0zq.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-kizqtzpvvl3i8/Realtime_IT.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Real_Time_logo.svg"
+    },
+    {
+        "id": "foodnetwork",
+        "name": "Food Network",
+        "url": "https://dk3okdd5036kz.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-o4pw0nc02sthz/Foodnetwork_IT.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/0/06/Food_Network_logo.svg"
+    },
+    {
+        "id": "cine34",
+        "name": "Cine34",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-b6/b6-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Cine34_logo.svg"
+    },
+    {
+        "id": "focus",
+        "name": "Focus",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-fu/fu-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Focus_channel.png"
+    },
+    {
+        "id": "rtl1025",
+        "name": "RTL 102.5",
+        "url": "https://dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S97044836/tbbP8T1ZRPBL/playlist.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/0/0e/RTL_102.5_logo.svg"
+    },
+    {
+        "id": "giallo",
+        "name": "Giallo",
+        "url": "https://d9fqo6nfqlv2h.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ulukbrgm1n3yb/Giallo_IT.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Giallo_-_Logo_2014.svg"
+    },
+    {
+        "id": "topcrime",
+        "name": "Top Crime",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-lt/lt-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Top_Crime_-_Logo_2013.svg"
+    },
+    {
+        "id": "italia2",
+        "name": "Italia 2",
+        "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-i2/i2-clr.isml/index.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Logo_Italia2.svg"
+    },
+    {
+        "id": "raiscuola",
+        "name": "Rai Scuola",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/raiscuola/browser-HLS8/raiscuola.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/1/11/Rai_Scuola_-_Logo_2017.svg"
+    },
+    {
+        "id": "raisport",
+        "name": "Rai Sport",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/raisport1/browser-HLS8/raisport1.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Rai_Sport_-_Logo_2022.svg"
+    },
+    {
+        "id": "raistoria",
+        "name": "Rai Storia",
+        "url": "https://viamotionhsi.netplus.ch/live/eds/raistoria/browser-HLS8/raistoria.m3u8",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Rai_Storia_-_Logo_2017.svg"
+    }
+]
