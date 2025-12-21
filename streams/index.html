@@ -60,16 +60,34 @@
         #stream-list a:hover img {
             transform: translateY(-3px);
         }
-        /* --- Home Button --- */
+        /* --- Home Button as Overlay --- */
         #home-button {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #1a1a21;
-            border-bottom: 1px solid #2a2a33;
+            background: rgba(26, 26, 33, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(42, 42, 51, 0.5);
             height: 50px;
-            transition: background 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.3s ease;
+            transform: translateY(0);
+            opacity: 1;
         }
+        
+        /* Hidden state for home button */
+        #home-button.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
         /* Make the <a> fill the full button area */
         #home-button a {
             display: flex;
@@ -85,8 +103,7 @@
             transition: color 0.2s ease;
         }
         #home-button:hover {
-            background: #24242b;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            background: rgba(36, 36, 43, 0.95);
         }
         #home-button img {
             width: 26px;
@@ -97,8 +114,11 @@
             flex-direction: column;
         }
         #stream-video {
-            width: 100%;
-            height: calc(100vh - 50px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: black;
             object-fit: contain;
             display: block;
@@ -108,7 +128,7 @@
             position: fixed;
             top: 16px;
             right: 16px;
-            z-index: 1000;
+            z-index: 1001;
             background: #1a1a21;
             border: 1px solid #3a3a4a;
             border-radius: 50%;
@@ -150,7 +170,6 @@
         }
         /* --- Smooth Fade --- */
         #stream-list,
-        #home-button,
         #stream-video {
             transition: opacity 0.25s ease;
         }
@@ -196,7 +215,7 @@
             border: none !important;
         }
 
-        /* Some webOS builds add a class called “focus-ring” */
+        /* Some webOS builds add a class called "focus-ring" */
         video.focus-ring,
         video[data-focused],
         video[data-focus-visible-added] {
@@ -210,11 +229,64 @@
 
 <body>
     <script>
+        // Auto-hide functionality
+        let hideTimeout;
+        let isMouseMoving = false;
+        let mouseTimer;
+        
+        function resetHideTimer() {
+            clearTimeout(hideTimeout);
+            // Show controls immediately when there's activity
+            const homeButton = document.getElementById('home-button');
+            if (homeButton) {
+                homeButton.classList.remove('hidden');
+            }
+            
+            // Hide after 3 seconds of inactivity
+            hideTimeout = setTimeout(() => {
+                const homeButton = document.getElementById('home-button');
+                if (homeButton && !homeButton.classList.contains('hidden') && 
+                    window.location.hash !== '' && window.location.hash !== '#') {
+                    homeButton.classList.add('hidden');
+                }
+            }, 3000);
+        }
+        
+        function handleMouseMove() {
+            isMouseMoving = true;
+            clearTimeout(mouseTimer);
+            resetHideTimer();
+            
+            mouseTimer = setTimeout(() => {
+                isMouseMoving = false;
+            }, 100);
+        }
+        
+        function handleVideoClick() {
+            const homeButton = document.getElementById('home-button');
+            if (homeButton) {
+                if (homeButton.classList.contains('hidden')) {
+                    homeButton.classList.remove('hidden');
+                    resetHideTimer();
+                } else {
+                    homeButton.classList.add('hidden');
+                }
+            }
+        }
+
         function run_stream(url, video) {
             // Add shortcuts when stream starts
             function handleKeydown(e) {
                 // Don't trigger if user is typing in an input field
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                
+                // Show controls on any key press
+                const homeButton = document.getElementById('home-button');
+                if (homeButton) {
+                    homeButton.classList.remove('hidden');
+                    resetHideTimer();
+                }
+                
                 switch(e.key) {
                     case 'f':
                         // Toggle fullscreen
@@ -245,6 +317,12 @@
             // Store the handler on video for cleanup
             video._keydownHandler = handleKeydown;
             document.addEventListener('keydown', video._keydownHandler);
+            
+            // Add mouse move listener for video
+            document.addEventListener('mousemove', handleMouseMove);
+            // Add click listener to video to toggle controls
+            video.addEventListener('click', handleVideoClick);
+            
             // Rest of your stream logic
             if (Hls.isSupported()) {
                 var hls = new Hls();
@@ -263,8 +341,20 @@
             } else {
                 alert("Your browser doesn't support HLS streaming.");
             }
+            
+            // Start the hide timer
+            resetHideTimer();
         }
+        
         function stop_stream(video) {
+            // Clear all timeouts
+            clearTimeout(hideTimeout);
+            clearTimeout(mouseTimer);
+            
+            // Remove event listeners
+            document.removeEventListener('mousemove', handleMouseMove);
+            video.removeEventListener('click', handleVideoClick);
+            
             // Remove ALL shortcuts at once
             if (video._keydownHandler) {
                 document.removeEventListener('keydown', video._keydownHandler);
@@ -283,6 +373,7 @@
             video.pause();
             setTimeout(() => video.load(), 100);
         }
+        
         function set_display(elements, displayState) {
             elements.forEach(elem => {
                 if (elem) elem.style.display = displayState;
@@ -332,7 +423,12 @@
                     const searched_channel_id = window.location.hash.replace(/^#/, '');
                     const channel = channel_data.find(c => c.id === searched_channel_id);
                     if (!channel) { 
-                        // home
+                        // home - clear timeouts and remove video listeners
+                        clearTimeout(hideTimeout);
+                        clearTimeout(mouseTimer);
+                        stream_video.removeEventListener('click', handleVideoClick);
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        
                         set_display([stream_list, debug_button], "")
                         set_display([home_button, stream_video], "none")
                         document.title = "TV Stream"
@@ -353,3 +449,4 @@
             })
     </script>
 </body>
+</html>
