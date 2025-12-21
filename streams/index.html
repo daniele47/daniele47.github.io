@@ -360,8 +360,8 @@
                         stop_stream(stream_video)
                     } else { 
                         // valid channel -> render video
-                        set_display([stream_list], "none")
-                        set_display([home_button, stream_video, site_footer, debug_button], "")
+                        set_display([stream_list, debug_button], "none")
+                        set_display([home_button, stream_video, site_footer], "")
                         site_footer.innerText = `© ${channel.name} Stream • ${footer_tips[Math.floor(Math.random() * footer_tips.length)]}`
                         document.title = channel.name + " Stream"
                         history.replaceState(null, '', window.location.pathname + window.location.hash);
