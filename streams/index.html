@@ -275,8 +275,13 @@
                 video.hls.destroy();
                 video.hls = null;
             }
+            // stronger pause handling since webos is weird
+            video.pause();
+            video.currentTime = 0;
+            video.removeAttribute('src')
             video.load();
             video.pause();
+            setTimeout(() => video.load(), 100);
         }
         function set_display(elements, displayState) {
             elements.forEach(elem => {
