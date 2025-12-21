@@ -98,20 +98,10 @@
         }
         #stream-video {
             width: 100%;
-            height: calc(100vh - 50px - 32px);
+            height: calc(100vh - 50px);
             background: black;
             object-fit: contain;
             display: block;
-        }
-        /* --- Footer --- */
-        #site-footer {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            padding: 10px 0;
-            background: #0c0c0f;
-            border-top: 1px solid #1a1a21;
-            margin-top: auto; /* pushes footer to bottom without stretching content */
         }
         /* --- Debug Button --- */
         #debug-button {
@@ -298,7 +288,6 @@
     <div id="stream-list" style="display:none"></div>
     <div id="home-button" style="display:none"><a href="#"><img id="home-button-icon">Home</a></div>
     <video id="stream-video" style="display:none" width="100%" controls autoplay></video>
-    <footer id="site-footer" style="display:none">© TV Stream • Click a channel to start streaming • Built with HLS.js</footer>
     <a id="debug-button" href="./debug.html" style="display: none"><img id="debug-button-icon"></img></a>
 
     <script>
@@ -324,20 +313,7 @@
                 const home_button = document.getElementById("home-button")
                 const stream_list = document.getElementById("stream-list")
                 const stream_video = document.getElementById("stream-video")
-                const site_footer = document.getElementById("site-footer")
                 const debug_button = document.getElementById("debug-button")
-
-                const footer_tips = [
-                    "Press F to fullscreen the streaming",
-                    "Press M to mute/unmute",
-                    "Press K to play/pause",
-                    "Press J to move backward",
-                    "Press L to move forward",
-                    "Click the video to play/pause",
-                    "Refresh if a channel freezes",
-                    "Some streams may take a moment to load",
-                    "Click Home button to return to the channel list",
-                ]
 
                 // initialize stream list
                 let html_string = '';
@@ -352,17 +328,15 @@
                     const channel = channel_data.find(c => c.id === searched_channel_id);
                     if (!channel) { 
                         // home
-                        set_display([stream_list, site_footer, debug_button], "")
+                        set_display([stream_list, debug_button], "")
                         set_display([home_button, stream_video], "none")
                         document.title = "TV Stream"
-                        site_footer.innerText = "© TV Stream • Click a channel to start streaming"
                         history.replaceState(null, '', window.location.pathname);
                         stop_stream(stream_video)
                     } else { 
                         // valid channel -> render video
                         set_display([stream_list, debug_button], "none")
-                        set_display([home_button, stream_video, site_footer], "")
-                        site_footer.innerText = `© ${channel.name} Stream • ${footer_tips[Math.floor(Math.random() * footer_tips.length)]}`
+                        set_display([home_button, stream_video], "")
                         document.title = channel.name + " Stream"
                         history.replaceState(null, '', window.location.pathname + window.location.hash);
                         run_stream(channel.url, stream_video)
