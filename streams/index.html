@@ -280,13 +280,6 @@
                 // Don't trigger if user is typing in an input field
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 
-                // Show controls on any key press
-                const homeButton = document.getElementById('home-button');
-                if (homeButton) {
-                    homeButton.classList.remove('hidden');
-                    resetHideTimer();
-                }
-                
                 switch(e.key) {
                     case 'f':
                         // Toggle fullscreen
