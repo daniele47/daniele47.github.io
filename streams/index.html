@@ -60,55 +60,159 @@
         #stream-list a:hover img {
             transform: translateY(-3px);
         }
-        /* --- Home Button as Overlay --- */
-        #home-button {
+        /* --- Channel Navigation Overlay --- */
+        #channel-nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(26, 26, 33, 0.85);
+            flex-direction: column;
+            background: rgba(26, 26, 33, 0.95);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(42, 42, 51, 0.5);
-            height: 50px;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         opacity 0.3s ease;
             transform: translateY(0);
             opacity: 1;
+            min-height: 44px;
         }
         
-        /* Hidden state for home button */
-        #home-button.hidden {
+        /* Hidden state */
+        #channel-nav.hidden {
             transform: translateY(-100%);
             opacity: 0;
             pointer-events: none;
         }
         
-        /* Make the <a> fill the full button area */
-        #home-button a {
+        /* Navigation container - responsive */
+        .nav-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+            padding: 4px 12px;
+        }
+        
+        /* Individual nav items */
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            text-align: center;
+            padding: 2px 4px;
+            min-height: 36px;
+        }
+        
+        /* Label above buttons */
+        .nav-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Channel buttons - all same style */
+        .nav-channel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             flex: 1;
             width: 100%;
-            height: 100%;
-            gap: 8px;
             text-decoration: none;
             color: #e6e6e6;
-            font-size: 16px;
-            transition: color 0.2s ease;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(42, 42, 51, 0.3);
         }
-        #home-button:hover {
-            background: rgba(36, 36, 43, 0.95);
+        
+        .nav-channel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(42, 42, 51, 0.5);
         }
-        #home-button img {
-            width: 26px;
-            height: 26px;
+        
+        /* Center button text and icon */
+        .nav-channel span,
+        .nav-channel img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
+        .channel-name {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
+        }
+        
+        .channel-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            border-radius: 3px;
+        }
+        
+        /* Current channel (home button) - keep the same style */
+        .home-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(42, 42, 51, 0.3);
+            cursor: pointer;
+        }
+        
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(42, 42, 51, 0.5);
+        }
+        
+        /* Responsive behavior */
+        @media (max-width: 768px) {
+            .nav-container {
+                justify-content: center;
+            }
+            
+            /* Hide prev/next on small screens */
+            .nav-item:first-child,
+            .nav-item:last-child {
+                display: none;
+            }
+            
+            /* Center home button - fill entire width */
+            .nav-item:nth-child(2) {
+                flex: 1;
+                width: 100%;
+                max-width: 100%;
+                padding: 2px 0;
+            }
+            
+            /* Make the home button fill its container */
+            .nav-item:nth-child(2) .nav-channel {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            /* Adjust label for full width */
+            .nav-item:nth-child(2) .nav-label {
+                width: 100%;
+                padding: 0 8px;
+            }
+        }
+        
         /* --- Video Layout --- */
         body:has(#stream-video:not([style*="display: none"])) {
             flex-direction: column;
@@ -123,17 +227,18 @@
             object-fit: contain;
             display: block;
         }
+        
         /* --- Debug Button --- */
         #debug-button {
             position: fixed;
-            top: 16px;
-            right: 16px;
+            top: 12px;
+            right: 12px;
             z-index: 1001;
-            background: #1a1a21;
+            background: rgba(26, 26, 33, 0.9);
             border: 1px solid #3a3a4a;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -142,54 +247,66 @@
             box-shadow: 
                 0 2px 6px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-        /* Style the image inside the button */
+        
         #debug-button-icon {
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             object-fit: contain;
             filter: brightness(0.8) saturate(1.2);
             transition: filter 0.25s ease;
         }
+        
         #debug-button:hover {
-            background: #24242b;
+            background: rgba(36, 36, 43, 0.95);
             border-color: #4a4a5a;
             box-shadow: 
                 0 4px 12px rgba(138, 138, 255, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.12);
             transform: translateY(-1px) scale(1.05);
         }
+        
         #debug-button:hover #debug-button-icon {
             filter: brightness(1) saturate(1.5);
         }
+        
         #debug-button:active {
             transform: translateY(0) scale(1);
             box-shadow: 
                 0 1px 3px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
+        
         /* --- Smooth Fade --- */
         #stream-list,
         #stream-video {
             transition: opacity 0.25s ease;
         }
+        
         [style*="display: none"] {
             opacity: 0;
         }
+        
         /* --- Scrollbar --- */
         ::-webkit-scrollbar {
             width: 8px;
         }
+        
         ::-webkit-scrollbar-thumb {
             background: #333;
             border-radius: 4px;
         }
+        
         ::-webkit-scrollbar-thumb:hover {
             background: #444;
         }
+        
         ::-webkit-scrollbar-track {
             background: #111;
         }
+        
         /* Reset any outline or box‑shadow the OS may add */
         video,
         video:focus,
@@ -229,6 +346,10 @@
 
 <body>
     <script>
+        // Global variables for channel data and navigation
+        let channelData = [];
+        let currentChannelIndex = -1;
+        
         // Auto-hide functionality
         let hideTimeout;
         let isMouseMoving = false;
@@ -237,17 +358,17 @@
         function resetHideTimer() {
             clearTimeout(hideTimeout);
             // Show controls immediately when there's activity
-            const homeButton = document.getElementById('home-button');
-            if (homeButton) {
-                homeButton.classList.remove('hidden');
+            const channelNav = document.getElementById('channel-nav');
+            if (channelNav) {
+                channelNav.classList.remove('hidden');
             }
             
             // Hide after 3 seconds of inactivity
             hideTimeout = setTimeout(() => {
-                const homeButton = document.getElementById('home-button');
-                if (homeButton && !homeButton.classList.contains('hidden') && 
+                const channelNav = document.getElementById('channel-nav');
+                if (channelNav && !channelNav.classList.contains('hidden') && 
                     window.location.hash !== '' && window.location.hash !== '#') {
-                    homeButton.classList.add('hidden');
+                    channelNav.classList.add('hidden');
                 }
             }, 3000);
         }
@@ -263,14 +384,73 @@
         }
         
         function handleVideoClick() {
-            const homeButton = document.getElementById('home-button');
-            if (homeButton) {
-                if (homeButton.classList.contains('hidden')) {
-                    homeButton.classList.remove('hidden');
+            const channelNav = document.getElementById('channel-nav');
+            if (channelNav) {
+                if (channelNav.classList.contains('hidden')) {
+                    channelNav.classList.remove('hidden');
                     resetHideTimer();
                 } else {
-                    homeButton.classList.add('hidden');
+                    channelNav.classList.add('hidden');
                 }
+            }
+        }
+        
+        // Function to update channel navigation
+        function updateChannelNavigation() {
+            const channelNav = document.getElementById('channel-nav');
+            if (!channelNav || !channelData.length) return;
+            
+            const navContainer = channelNav.querySelector('.nav-container');
+            
+            if (currentChannelIndex === -1) {
+                // We're at home - show simple home button
+                navContainer.innerHTML = `
+                    <div class="nav-item" style="display: none;"></div>
+                    <div class="nav-item">
+                        <div class="nav-label">current view</div>
+                        <div class="nav-channel home-button" onclick="window.location.hash='#'">
+                            <span class="channel-name">Channels</span>
+                            <img src="${window.videoIcon || ''}" alt="" class="channel-icon">
+                        </div>
+                    </div>
+                    <div class="nav-item" style="display: none;"></div>
+                `;
+            } else {
+                // We're watching a channel, show full navigation
+                const channelCount = channelData.length;
+                
+                // Calculate previous and next indices with cycling
+                const prevIndex = (currentChannelIndex - 1 + channelCount) % channelCount;
+                const nextIndex = (currentChannelIndex + 1) % channelCount;
+                
+                // Get channels
+                const prevChannel = channelData[prevIndex];
+                const currentChannel = channelData[currentChannelIndex];
+                const nextChannel = channelData[nextIndex];
+                
+                navContainer.innerHTML = `
+                    <div class="nav-item">
+                        <div class="nav-label">previous channel</div>
+                        <a href="#${prevChannel.id}" class="nav-channel">
+                            <span class="channel-name">${prevChannel.name}</span>
+                            <img src="${prevChannel.icon}" alt="" class="channel-icon">
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-label">go to channel list</div>
+                        <div class="nav-channel home-button" onclick="window.location.hash='#'">
+                            <span class="channel-name">Channels</span>
+                            <img src="${window.videoIcon || ''}" alt="" class="channel-icon">
+                        </div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-label">next channel</div>
+                        <a href="#${nextChannel.id}" class="nav-channel">
+                            <span class="channel-name">${nextChannel.name}</span>
+                            <img src="${nextChannel.icon}" alt="" class="channel-icon">
+                        </a>
+                    </div>
+                `;
             }
         }
 
@@ -307,6 +487,7 @@
                         break;
                 }
             }
+            
             // Store the handler on video for cleanup
             video._keydownHandler = handleKeydown;
             document.addEventListener('keydown', video._keydownHandler);
@@ -334,6 +515,9 @@
             } else {
                 alert("Your browser doesn't support HLS streaming.");
             }
+            
+            // Update channel navigation
+            updateChannelNavigation();
             
             // Start the hide timer
             resetHideTimer();
@@ -375,9 +559,11 @@
     </script>
 
     <div id="stream-list" style="display:none"></div>
-    <div id="home-button" style="display:none"><a href="#"><img id="home-button-icon">Home</a></div>
+    <div id="channel-nav" style="display:none">
+        <div class="nav-container"></div>
+    </div>
     <video id="stream-video" style="display:none" width="100%" controls autoplay></video>
-    <a id="debug-button" href="./debug.html" style="display: none"><img id="debug-button-icon"></img></a>
+    <a id="debug-button" href="./debug.html" style="display: none"><img id="debug-button-icon" alt=""></a>
 
     <script>
         fetch("./api/config.json")
@@ -385,13 +571,15 @@
             .then(config_data => {
                 const video_icon = config_data.icon.video
                 const gear_icon = config_data.icon.gear
-                document.getElementById("home-button-icon").setAttribute("src", video_icon)
                 document.getElementById("debug-button-icon").setAttribute("src", gear_icon)
                 const link = document.createElement('link')
                 link.rel = 'icon'
                 link.type = 'image/png'
                 link.href = video_icon
                 document.head.appendChild(link)
+                
+                // Store the video icon for use in navigation
+                window.videoIcon = video_icon;
             })
     </script>
 
@@ -399,23 +587,27 @@
         fetch("./api/channels.json")
             .then(response => response.json())
             .then(channel_data => {
-                const home_button = document.getElementById("home-button")
+                // Store channel data globally
+                channelData = channel_data;
+                
                 const stream_list = document.getElementById("stream-list")
                 const stream_video = document.getElementById("stream-video")
                 const debug_button = document.getElementById("debug-button")
+                const channel_nav = document.getElementById("channel-nav")
 
                 // initialize stream list
                 let html_string = '';
                 for (const channel of channel_data) {
-                    html_string += `<a href="#${channel.id}"><img src="${channel.icon}">${channel.name}</a>`
+                    html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
                 }
                 stream_list.innerHTML = html_string
 
                 // change page based on the fragment
                 window.addEventListener('hashchange', function() {
                     const searched_channel_id = window.location.hash.replace(/^#/, '');
-                    const channel = channel_data.find(c => c.id === searched_channel_id);
-                    if (!channel) { 
+                    const channelIndex = channel_data.findIndex(c => c.id === searched_channel_id);
+                    
+                    if (channelIndex === -1) { 
                         // home - clear timeouts and remove video listeners
                         clearTimeout(hideTimeout);
                         clearTimeout(mouseTimer);
@@ -423,16 +615,23 @@
                         document.removeEventListener('mousemove', handleMouseMove);
                         
                         set_display([stream_list, debug_button], "")
-                        set_display([home_button, stream_video], "none")
+                        set_display([channel_nav, stream_video], "none")
                         document.title = "TV Stream"
-                        history.replaceState(null, '', window.location.pathname);
                         stop_stream(stream_video)
+                        
+                        // Reset current channel index
+                        currentChannelIndex = -1;
+                        
+                        // Update navigation for home view
+                        updateChannelNavigation();
                     } else { 
                         // valid channel -> render video
+                        currentChannelIndex = channelIndex;
+                        const channel = channel_data[channelIndex];
+                        
                         set_display([stream_list, debug_button], "none")
-                        set_display([home_button, stream_video], "")
+                        set_display([channel_nav, stream_video], "")
                         document.title = channel.name + " Stream"
-                        history.replaceState(null, '', window.location.pathname + window.location.hash);
                         run_stream(channel.url, stream_video)
                     }
                 });
