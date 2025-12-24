@@ -430,9 +430,43 @@
         let hideTimeout;
         let isMouseMoving = false;
         let mouseTimer;
+        let isHoveringOverControls = false; // Track if hovering over navigation controls
+
+        function setupHoverListeners() {
+            const channelNav = document.getElementById('channel-nav');
+            if (!channelNav) return;
+            
+            // Get all navigation channel links
+            const navChannels = channelNav.querySelectorAll('.nav-channel');
+            
+            navChannels.forEach(link => {
+                // Remove existing listeners to avoid duplicates
+                link.removeEventListener('mouseenter', handleNavMouseEnter);
+                link.removeEventListener('mouseleave', handleNavMouseLeave);
+                
+                // Add new listeners
+                link.addEventListener('mouseenter', handleNavMouseEnter);
+                link.addEventListener('mouseleave', handleNavMouseLeave);
+            });
+        }
+
+        function handleNavMouseEnter() {
+            isHoveringOverControls = true;
+            clearTimeout(hideTimeout); // Immediately clear any hide timeout
+        }
+
+        function handleNavMouseLeave() {
+            isHoveringOverControls = false;
+            // Reset the hide timer when mouse leaves controls
+            resetHideTimer();
+        }
         
         function resetHideTimer() {
             clearTimeout(hideTimeout);
+            
+            // Don't hide if hovering over navigation controls
+            if (isHoveringOverControls) return;
+            
             // Show controls immediately when there's activity
             const channelNav = document.getElementById('channel-nav');
             if (channelNav) {
@@ -482,6 +516,8 @@
                     if (channelInfo) {
                         channelInfo.classList.remove('show');
                     }
+                    // Reset hover state when manually hiding
+                    isHoveringOverControls = false;
                 }
             }
         }
@@ -570,6 +606,9 @@
                     channelInfo.classList.add('show');
                 }
             }
+            
+            // Set up hover listeners after updating the navigation
+            setupHoverListeners();
         }
 
         function run_stream(url, video) {
@@ -739,6 +778,9 @@
                         
                         // Reset current channel index
                         currentChannelIndex = -1;
+                        
+                        // Reset hover state
+                        isHoveringOverControls = false;
                         
                         // Update navigation for home view
                         updateChannelNavigation();
