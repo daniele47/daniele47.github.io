@@ -737,66 +737,65 @@
                 link.href = video_icon
                 document.head.appendChild(link)
             })
-    </script>
+            .then(() => {
+                fetch("./api/channels.json")
+                    .then(response => response.json())
+                    .then(channel_data => {
+                        // Store channel data globally
+                        channelData = channel_data;
 
-    <script>
-        fetch("./api/channels.json")
-            .then(response => response.json())
-            .then(channel_data => {
-                // Store channel data globally
-                channelData = channel_data;
-                
-                const stream_list = document.getElementById("stream-list")
-                const stream_video = document.getElementById("stream-video")
-                const debug_button = document.getElementById("debug-button")
-                const channel_nav = document.getElementById("channel-nav")
+                        const stream_list = document.getElementById("stream-list")
+                        const stream_video = document.getElementById("stream-video")
+                        const debug_button = document.getElementById("debug-button")
+                        const channel_nav = document.getElementById("channel-nav")
 
-                // initialize stream list
-                let html_string = '';
-                for (const channel of channel_data) {
-                    html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
-                }
-                stream_list.innerHTML = html_string
+                        // initialize stream list
+                        let html_string = '';
+                        for (const channel of channel_data) {
+                            html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
+                        }
+                        stream_list.innerHTML = html_string
 
-                // change page based on the fragment
-                window.addEventListener('hashchange', function() {
-                    const searched_channel_id = window.location.hash.replace(/^#/, '');
-                    const channelIndex = channel_data.findIndex(c => c.id === searched_channel_id);
-                    
-                    if (channelIndex === -1) { 
-                        // home - clear timeouts and remove video listeners
-                        clearTimeout(hideTimeout);
-                        clearTimeout(mouseTimer);
-                        stream_video.removeEventListener('click', handleVideoClick);
-                        document.removeEventListener('mousemove', handleMouseMove);
-                        
-                        set_display([stream_list, debug_button], "")
-                        set_display([channel_nav, stream_video], "none")
-                        document.title = "TV Stream"
-                        stop_stream(stream_video)
-                        
-                        // Reset current channel index
-                        currentChannelIndex = -1;
-                        
-                        // Reset hover state
-                        isHoveringOverControls = false;
-                        
-                        // Update navigation for home view
-                        updateChannelNavigation();
-                    } else { 
-                        // valid channel -> render video
-                        currentChannelIndex = channelIndex;
-                        const channel = channel_data[channelIndex];
-                        
-                        set_display([stream_list, debug_button], "none")
-                        set_display([channel_nav, stream_video], "")
-                        document.title = channel.name + " Stream"
-                        run_stream(channel.url, stream_video)
-                    }
-                });
+                        // change page based on the fragment
+                        window.addEventListener('hashchange', function() {
+                            const searched_channel_id = window.location.hash.replace(/^#/, '');
+                            const channelIndex = channel_data.findIndex(c => c.id === searched_channel_id);
 
-                // force hashchange event to start at page load
-                window.dispatchEvent(new HashChangeEvent('hashchange'));
+                            if (channelIndex === -1) { 
+                                // home - clear timeouts and remove video listeners
+                                clearTimeout(hideTimeout);
+                                clearTimeout(mouseTimer);
+                                stream_video.removeEventListener('click', handleVideoClick);
+                                document.removeEventListener('mousemove', handleMouseMove);
+
+                                set_display([stream_list, debug_button], "")
+                                set_display([channel_nav, stream_video], "none")
+                                document.title = "TV Stream"
+                                stop_stream(stream_video)
+
+                                // Reset current channel index
+                                currentChannelIndex = -1;
+
+                                // Reset hover state
+                                isHoveringOverControls = false;
+
+                                // Update navigation for home view
+                                updateChannelNavigation();
+                            } else { 
+                                // valid channel -> render video
+                                currentChannelIndex = channelIndex;
+                                const channel = channel_data[channelIndex];
+
+                                set_display([stream_list, debug_button], "none")
+                                set_display([channel_nav, stream_video], "")
+                                document.title = channel.name + " Stream"
+                                run_stream(channel.url, stream_video)
+                            }
+                        });
+
+                        // force hashchange event to start at page load
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                    })
             })
     </script>
 </body>
