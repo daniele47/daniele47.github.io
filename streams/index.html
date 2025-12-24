@@ -179,7 +179,69 @@
             border-color: rgba(42, 42, 51, 0.5);
         }
         
-        /* Responsive behavior */
+        /* Centered channel info element - FIXED position to viewport - MINIMAL SIZE */
+        .channel-info-center {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: rgba(26, 26, 33, 0.95);
+            border: 1px solid rgba(42, 42, 51, 0.3);
+            z-index: 1002;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            min-width: auto;
+            width: auto;
+            max-width: none;
+        }
+        
+        .channel-info-center.show {
+            opacity: 1;
+        }
+        
+        .channel-info-center .channel-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        
+        .channel-info-center .channel-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .channel-info-center .channel-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .channel-info-center .channel-name {
+            font-size: 13px;
+            font-weight: 500;
+            max-width: none;
+            white-space: nowrap;
+        }
+        
+        /* Remove all responsive width constraints - let it size to content */
         @media (max-width: 768px) {
             .nav-container {
                 justify-content: center;
@@ -210,6 +272,20 @@
             .nav-item:nth-child(2) .nav-label {
                 width: 100%;
                 padding: 0 8px;
+            }
+            
+            /* Remove responsive constraints for channel info */
+            .channel-info-center {
+                width: auto;
+                max-width: none;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            /* Remove responsive constraints for channel info */
+            .channel-info-center {
+                width: auto;
+                max-width: none;
             }
         }
         
@@ -361,6 +437,11 @@
             const channelNav = document.getElementById('channel-nav');
             if (channelNav) {
                 channelNav.classList.remove('hidden');
+                // Also show the channel info
+                const channelInfo = document.querySelector('.channel-info-center');
+                if (channelInfo) {
+                    channelInfo.classList.add('show');
+                }
             }
             
             // Hide after 3 seconds of inactivity
@@ -369,6 +450,11 @@
                 if (channelNav && !channelNav.classList.contains('hidden') && 
                     window.location.hash !== '' && window.location.hash !== '#') {
                     channelNav.classList.add('hidden');
+                    // Also hide the channel info
+                    const channelInfo = document.querySelector('.channel-info-center');
+                    if (channelInfo) {
+                        channelInfo.classList.remove('show');
+                    }
                 }
             }, 3000);
         }
@@ -391,6 +477,11 @@
                     resetHideTimer();
                 } else {
                     channelNav.classList.add('hidden');
+                    // Also hide the channel info
+                    const channelInfo = document.querySelector('.channel-info-center');
+                    if (channelInfo) {
+                        channelInfo.classList.remove('show');
+                    }
                 }
             }
         }
@@ -415,6 +506,12 @@
                     </div>
                     <div class="nav-item" style="display: none;"></div>
                 `;
+                
+                // Hide channel info when at home
+                const channelInfo = document.querySelector('.channel-info-center');
+                if (channelInfo) {
+                    channelInfo.classList.remove('show');
+                }
             } else {
                 // We're watching a channel, show full navigation
                 const channelCount = channelData.length;
@@ -451,6 +548,27 @@
                         </a>
                     </div>
                 `;
+                
+                // Update or create channel info element (append to body for proper positioning)
+                let channelInfo = document.querySelector('.channel-info-center');
+                if (!channelInfo) {
+                    channelInfo = document.createElement('div');
+                    channelInfo.className = 'channel-info-center';
+                    document.body.appendChild(channelInfo);
+                }
+                
+                channelInfo.innerHTML = `
+                    <div class="channel-label">CURRENT CHANNEL</div>
+                    <div class="channel-content">
+                        <span class="channel-name">${currentChannel.name}</span>
+                        <img src="${currentChannel.icon}" alt="" class="channel-icon">
+                    </div>
+                `;
+                
+                // Show the channel info only if overlay is visible
+                if (!channelNav.classList.contains('hidden')) {
+                    channelInfo.classList.add('show');
+                }
             }
         }
 
