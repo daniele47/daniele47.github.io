@@ -727,16 +727,15 @@
             .then(response => response.json())
             .then(config_data => {
                 const video_icon = config_data.icon.video
+                window.videoIcon = video_icon;
                 const gear_icon = config_data.icon.gear
                 document.getElementById("debug-button-icon").setAttribute("src", gear_icon)
+
                 const link = document.createElement('link')
                 link.rel = 'icon'
                 link.type = 'image/png'
                 link.href = video_icon
                 document.head.appendChild(link)
-                
-                // Store the video icon for use in navigation
-                window.videoIcon = video_icon;
             })
     </script>
 
