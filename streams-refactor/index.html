@@ -9,6 +9,14 @@
         <style>
 /* TODO */
 img {width: 50px;} /* TEMPORARY, FOR TESTING! */
+#stream-channel-nav {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#stream-channel-nav:hover {
+    opacity: 1;
+}
         </style>
     </head>
     <body>
@@ -41,18 +49,18 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
         </div>
         <script>
             // DOM elements
-            const elem_home = document.getElementById("stream-home")
-            const elem_channel = document.getElementById("stream-channel")
-            const elem_channel_video = document.getElementById("stream-channel-video")
-            const elem_channel_nav = document.getElementById("stream-channel-nav")
-            const elem_channel_prev_link = document.getElementById("stream-channel-prev-link")
-            const elem_channel_prev_name = document.getElementById("stream-channel-prev-name")
-            const elem_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
-            const elem_channel_home_name = document.getElementById("stream-channel-home-name")
-            const elem_channel_home_icon = document.getElementById("stream-channel-home-icon")
-            const elem_channel_next_link = document.getElementById("stream-channel-next-link")
-            const elem_channel_next_name = document.getElementById("stream-channel-next-name")
-            const elem_channel_next_icon = document.getElementById("stream-channel-next-icon")
+            const stream_home = document.getElementById("stream-home")
+            const stream_channel = document.getElementById("stream-channel")
+            const stream_channel_video = document.getElementById("stream-channel-video")
+            const stream_channel_nav = document.getElementById("stream-channel-nav")
+            const stream_channel_prev_link = document.getElementById("stream-channel-prev-link")
+            const stream_channel_prev_name = document.getElementById("stream-channel-prev-name")
+            const stream_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
+            const stream_channel_home_name = document.getElementById("stream-channel-home-name")
+            const stream_channel_home_icon = document.getElementById("stream-channel-home-icon")
+            const stream_channel_next_link = document.getElementById("stream-channel-next-link")
+            const stream_channel_next_name = document.getElementById("stream-channel-next-name")
+            const stream_channel_next_icon = document.getElementById("stream-channel-next-icon")
 
             // channels data
             const channels = [{
@@ -189,16 +197,13 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
                         if (data.fatal) {
                             switch(data.type) {
                                 case Hls.ErrorTypes.NETWORK_ERROR:
-                                    console.log("Network error - trying to recover")
-                                    hls.startLoad()
+                                    console.log("Network error - not recovering")
                                     break
                                 case Hls.ErrorTypes.MEDIA_ERROR:
-                                    console.log("Media error - trying to recover")
-                                    hls.recoverMediaError()
+                                    console.log("Media error - not recovering")
                                     break
                                 default:
-                                    console.log("Fatal error - cannot recover")
-                                    stop_stream(video)
+                                    console.log("Fatal error - not recovering")
                                     break
                             }
                         }
@@ -251,7 +256,7 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
             for (const channel of channels) {
                 html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
             }
-            elem_home.innerHTML = html_string
+            stream_home.innerHTML = html_string
 
             // change page based on the fragment
             window.addEventListener('hashchange', function() {
@@ -261,25 +266,25 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
                 if (channel_index === -1){ // home page
                     history.replaceState(null, null, window.location.origin + window.location.pathname)
                     document.title = "TV Streams"
-                    elem_home.style.display = ""
-                    elem_channel.style.display = "none"
-                    stop_stream(elem_channel_video)
+                    stream_home.style.display = ""
+                    stream_channel.style.display = "none"
+                    stop_stream(stream_channel_video)
                 } else { // channel page
                     history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.hash)
                     document.title = `${channel.name} Stream`
-                    elem_home.style.display = "none"
-                    elem_channel.style.display = ""
+                    stream_home.style.display = "none"
+                    stream_channel.style.display = ""
                     const channel_prev = channels[(channel_index - 1 + channels.length) % channels.length]
                     const channel_next = channels[(channel_index + 1) % channels.length]
-                    elem_channel_prev_link.href = `#${channel_prev.id}`
-                    elem_channel_prev_name.textContent = `${channel_prev.name}`
-                    elem_channel_prev_icon.src = `${channel_prev.icon}`
-                    elem_channel_home_name.textContent = `${channel.name}`
-                    elem_channel_home_icon.src = `${channel.icon}`
-                    elem_channel_next_link.href = `#${channel_next.id}`
-                    elem_channel_next_name.textContent = `${channel_next.name}`
-                    elem_channel_next_icon.src = `${channel_next.icon}`
-                    run_stream(channel.url, elem_channel_video)
+                    stream_channel_prev_link.href = `#${channel_prev.id}`
+                    stream_channel_prev_name.textContent = `${channel_prev.name}`
+                    stream_channel_prev_icon.src = `${channel_prev.icon}`
+                    stream_channel_home_name.textContent = `${channel.name}`
+                    stream_channel_home_icon.src = `${channel.icon}`
+                    stream_channel_next_link.href = `#${channel_next.id}`
+                    stream_channel_next_name.textContent = `${channel_next.name}`
+                    stream_channel_next_icon.src = `${channel_next.icon}`
+                    run_stream(channel.url, stream_channel_video)
                 }
             });
 
