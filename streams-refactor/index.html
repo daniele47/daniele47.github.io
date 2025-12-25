@@ -203,14 +203,15 @@
                 }
                 else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                     video.src = url
-                    video.removeEventListener('loadedmetadata', video._loadedMetaHandler)
-                    video._loadedMetaHandler = function() {
-                        video.play().catch(e => console.log("Autoplay prevented:", e))
-                    }
-                    video.addEventListener('loadedmetadata', video._loadedMetaHandler)
+                    video.addEventListener('loadedmetadata', function() {
+                        video.play().catch(e => {
+                            console.log("Autoplay prevented:", e)
+                            video.controls = true
+                        })
+                    }, { once: true })
                     video.addEventListener('error', function(e) {
                         console.error("Native HLS error:", e)
-                    })
+                    }, { once: true })
                 } else {
                     alert("Your browser doesn't support HLS streaming.")
                 }
