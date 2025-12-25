@@ -11,7 +11,7 @@
     </head>
     <body>
         <div id="stream-list" style="display:none"></div>
-        <video id="stream-video" style="display:none" width="100%" controls autoplay></video>
+        <video id="stream-video" style="display:none" width="100" controls autoplay></video>
         <script>
             const elem_list = document.getElementById("stream-list")
             const elem_video = document.getElementById("stream-video")
@@ -98,11 +98,6 @@
                 "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-fu/fu-clr.isml/index.m3u8",
                 "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Focus_channel.png"
             }, {
-                "id": "rtl1025",
-                "name": "RTL 102.5",
-                "url": "https://dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S97044836/tbbP8T1ZRPBL/playlist.m3u8",
-                "icon": "https://upload.wikimedia.org/wikipedia/commons/0/0e/RTL_102.5_logo.svg"
-            }, {
                 "id": "giallo",
                 "name": "Giallo",
                 "url": "https://d9fqo6nfqlv2h.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ulukbrgm1n3yb/Giallo_IT.m3u8",
@@ -133,6 +128,14 @@
                 "url": "https://viamotionhsi.netplus.ch/live/eds/raistoria/browser-HLS8/raistoria.m3u8",
                 "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Rai_Storia_-_Logo_2017.svg"
             }]
+
+            // initialize channel list
+            let html_string = '';
+            for (const channel of channels) {
+                html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
+            }
+            elem_list.innerHTML = html_string
+
         </script>
     </body>
 </html>
