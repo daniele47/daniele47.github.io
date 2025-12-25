@@ -121,27 +121,17 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0.75rem 2rem;
     z-index: 1000;
-    transition: var(--transition);
-    transform: translateY(-100%);
     opacity: 0;
-}
-
-/* Show when hovering the channel container */
-#stream-channel:hover #stream-channel-nav {
-    transform: translateY(0);
-    opacity: 1;
 }
 
 /* Also show when hovering the navigation itself (for when it's already visible) */
 #stream-channel-nav:hover {
-    transform: translateY(0);
     opacity: 1;
 }
 
     /* Show on touch devices - always visible */
     @media (hover: none) and (pointer: coarse) {
         #stream-channel-nav {
-            transform: translateY(0) !important;
             opacity: 1 !important;
             background: rgba(10, 10, 10, 0.98);
         }
@@ -286,7 +276,6 @@ body {
         /* Always show navigation on mobile */
         @media (hover: none) and (pointer: coarse) {
             #stream-channel-nav {
-                transform: translateY(0) !important;
                 opacity: 1 !important;
                 position: relative;
                 background: var(--bg-secondary);
