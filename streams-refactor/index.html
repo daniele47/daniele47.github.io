@@ -8,6 +8,7 @@
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
         <style>
 /* TODO */
+img {width: 50px;} /* TEMPORARY, FOR TESTING! */
         </style>
     </head>
     <body>
@@ -38,13 +39,12 @@
         </div>
         <script>
             // DOM elements
-            const elem_list = document.getElementById("stream-list")
+            const elem_home = document.getElementById("stream-home")
             const elem_channel = document.getElementById("stream-channel")
             const elem_channel_video = document.getElementById("stream-channel-video")
             const elem_channel_prev_link = document.getElementById("stream-channel-prev-link")
             const elem_channel_prev_name = document.getElementById("stream-channel-prev-name")
             const elem_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
-            const elem_channel_home_link = document.getElementById("stream-channel-home-link")
             const elem_channel_home_name = document.getElementById("stream-channel-home-name")
             const elem_channel_home_icon = document.getElementById("stream-channel-home-icon")
             const elem_channel_next_link = document.getElementById("stream-channel-next-link")
@@ -248,7 +248,40 @@
             for (const channel of channels) {
                 html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
             }
-            elem_list.innerHTML = html_string
+            elem_home.innerHTML = html_string
+
+            // change page based on the fragment
+            window.addEventListener('hashchange', function() {
+                const hash_channel_id = window.location.hash.slice(1);
+                const channel_index = channels.findIndex(item => item.id === hash_channel_id);
+                const channel = channels[channel_index]
+                if (channel_index === -1){ // home page
+                    history.replaceState(null, null, window.location.origin + window.location.pathname)
+                    document.title = "TV Streams"
+                    elem_home.style.display = ""
+                    elem_channel.style.display = "none"
+                    stop_stream(elem_channel_video)
+                } else { // channel page
+                    history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.hash)
+                    document.title = `${channel.name} Stream`
+                    elem_home.style.display = "none"
+                    elem_channel.style.display = ""
+                    const channel_prev = channels[(channel_index - 1 + channels.length) % channels.length]
+                    const channel_next = channels[(channel_index + 1) % channels.length]
+                    elem_channel_prev_link.href = `#${channel_prev.id}`
+                    elem_channel_prev_name.textContent = `${channel_prev.name}`
+                    elem_channel_prev_icon.src = `${channel_prev.icon}`
+                    elem_channel_home_name.textContent = `${channel.name}`
+                    elem_channel_home_icon.src = `${channel.icon}`
+                    elem_channel_next_link.href = `#${channel_next.id}`
+                    elem_channel_next_name.textContent = `${channel_next.name}`
+                    elem_channel_next_icon.src = `${channel_next.icon}`
+                    run_stream(channel.url, elem_channel_video)
+                }
+            });
+
+            // force hashchange event to start at page load
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
 
         </script>
     </body>
