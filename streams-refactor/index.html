@@ -21,23 +21,13 @@
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
     --border-color: #333333;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     --transition: all 0.3s ease;
-}
-
-html, body {
-    height: 100%;
-    overflow: hidden;
 }
 
 body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    min-height: 100vh;
-    width: 100vw;
-    overflow-x: hidden;
-    position: relative;
+    font-family: sans-serif;
 }
 
 /* Home Page Styles */
@@ -47,7 +37,6 @@ body {
     gap: 1.5rem;
     padding: 2rem;
     margin: 0 auto;
-    overflow-y: auto;
 }
 
 #stream-home a {
@@ -68,7 +57,7 @@ body {
 
 #stream-home a:hover {
     background: var(--bg-hover);
-    border-color: #444444;
+    border-color: var(--border-color);
     transform: translateY(-2px);
 }
 
@@ -219,8 +208,8 @@ body {
                 <div id="stream-channel-home" class="nav-item">
                     <div class="nav-label">go to channel list</div>
                     <a id="stream-channel-home-link" href="#" class="nav-channel">
-                        <span id="stream-channel-home-name" class="channel-name"></span>
-                        <img id="stream-channel-home-icon" src="about:blank" alt="" class="channel-icon">
+                        <span id="stream-channel-home-name" class="channel-name">Channels</span>
+                        <img id="stream-channel-home-icon" src="./favicon.png" alt="" class="channel-icon">
                     </a>
                 </div>
                 <div id="stream-channel-next" class="nav-item">
@@ -241,8 +230,6 @@ body {
             const stream_channel_prev_link = document.getElementById("stream-channel-prev-link")
             const stream_channel_prev_name = document.getElementById("stream-channel-prev-name")
             const stream_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
-            const stream_channel_home_name = document.getElementById("stream-channel-home-name")
-            const stream_channel_home_icon = document.getElementById("stream-channel-home-icon")
             const stream_channel_next_link = document.getElementById("stream-channel-next-link")
             const stream_channel_next_name = document.getElementById("stream-channel-next-name")
             const stream_channel_next_icon = document.getElementById("stream-channel-next-icon")
@@ -423,8 +410,6 @@ body {
                     stream_channel_prev_link.href = `#${channel_prev.id}`
                     stream_channel_prev_name.textContent = `${channel_prev.name}`
                     stream_channel_prev_icon.src = `${channel_prev.icon}`
-                    stream_channel_home_name.textContent = `${channel.name}`
-                    stream_channel_home_icon.src = `${channel.icon}`
                     stream_channel_next_link.href = `#${channel_next.id}`
                     stream_channel_next_name.textContent = `${channel_next.name}`
                     stream_channel_next_icon.src = `${channel_next.icon}`
