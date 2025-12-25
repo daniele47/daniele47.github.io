@@ -7,21 +7,386 @@
         <title>TV Streams</title>
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
         <style>
-/* TODO */
-img {width: 50px;} /* TEMPORARY, FOR TESTING! */
-#stream-channel-nav {
-    position: absolute;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-video{
+
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #2a2a2a;
+    --bg-hover: #333333;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --transition: all 0.3s ease;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Home Page Styles */
+#stream-home {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+#stream-home a {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition);
+    min-height: 180px;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#stream-home a:hover {
+    background: var(--bg-hover);
+    border-color: #444444;
+    transform: translateY(-2px);
+}
+
+#stream-home img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: brightness(0.9);
+    transition: var(--transition);
+}
+
+#stream-home a:hover img {
+    filter: brightness(1);
+    transform: scale(1.05);
+}
+
+/* Channel Page Styles */
+#stream-channel {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: black;
-    object-fit: contain;
-    display: block;
+    background: #000;
+    z-index: 1;
 }
+
+#stream-channel-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+/* Navigation Bar - Show on channel hover */
+#stream-channel-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.75rem 2rem;
+    z-index: 1000;
+    transition: var(--transition);
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+/* Show when hovering the channel container */
+#stream-channel:hover #stream-channel-nav {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Also show when hovering the navigation itself (for when it's already visible) */
+#stream-channel-nav:hover {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+    /* Show on touch devices - always visible */
+    @media (hover: none) and (pointer: coarse) {
+        #stream-channel-nav {
+            transform: translateY(0) !important;
+            opacity: 1 !important;
+            background: rgba(10, 10, 10, 0.98);
+        }
+
+        /* Make navigation items larger for touch */
+        .nav-item {
+            min-width: 120px !important;
+        }
+
+        .nav-channel {
+            padding: 0.75rem 1rem !important;
+        }
+
+        .nav-label {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+    }
+
+    .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 140px;
+    }
+
+    .nav-label {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .nav-channel {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: var(--transition);
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+
+    .nav-channel:hover {
+        background: var(--bg-hover);
+        border-color: #444444;
+    }
+
+    .nav-channel:hover .nav-label {
+        color: var(--text-secondary);
+    }
+
+    .nav-channel:hover .channel-name {
+        color: var(--text-primary);
+    }
+
+    .channel-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        color: var(--text-secondary);
+    }
+
+    .channel-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        border-radius: 4px;
+        background: var(--bg-secondary);
+        padding: 2px;
+        transition: var(--transition);
+    }
+
+    .nav-channel:hover .channel-icon {
+        transform: scale(1.05);
+    }
+
+    /* Center item (current channel) */
+    .nav-item:nth-child(2) .nav-channel {
+        background: var(--bg-tertiary);
+        border-color: var(--border-color);
+    }
+
+    .nav-item:nth-child(2) .channel-name {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        #stream-home {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        #stream-home a {
+            padding: 1rem;
+            min-height: 140px;
+        }
+
+        #stream-home img {
+            width: 60px;
+            height: 60px;
+        }
+
+        #stream-channel-nav {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: rgba(10, 10, 10, 0.98);
+        }
+
+        .nav-item {
+            min-width: 100%;
+        }
+
+        .nav-channel {
+            max-width: 100%;
+            padding: 0.75rem;
+        }
+
+        .channel-name {
+            font-size: 0.85rem;
+        }
+
+        .nav-label {
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        /* Always show navigation on mobile */
+        @media (hover: none) and (pointer: coarse) {
+            #stream-channel-nav {
+                transform: translateY(0) !important;
+                opacity: 1 !important;
+                position: relative;
+                background: var(--bg-secondary);
+                border-top: 1px solid var(--border-color);
+            }
+
+            #stream-channel-video {
+                height: calc(100vh - 200px);
+            }
+        }
+    }
+
+    /* Tablet Responsive */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        #stream-home {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        #stream-channel-nav {
+            padding: 1rem;
+        }
+
+        .nav-item {
+            min-width: 120px;
+        }
+    }
+
+    /* Loading state for video */
+    #stream-channel-video::-webkit-media-controls {
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    #stream-channel-video:hover::-webkit-media-controls {
+        opacity: 1;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--bg-tertiary);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #444444;
+    }
+
+    /* Focus states for accessibility */
+    a:focus-visible,
+    .nav-channel:focus-visible {
+        outline: 2px solid #666666;
+        outline-offset: 2px;
+    }
+
+    /* Error state for broken images */
+    img[src*="about:blank"] {
+        opacity: 0.3;
+        background: var(--bg-secondary);
+        padding: 4px;
+    }
+
+    /* Animation for page transitions */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #stream-home a {
+        animation: fadeIn 0.3s ease forwards;
+        animation-delay: calc(var(--item-index, 0) * 0.05s);
+    }
+
+    /* Make sure nothing can cause vertical scroll */
+    #stream-home {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bg-tertiary) var(--bg-secondary);
+    }
+
+    #stream-home:focus-visible {
+        outline: none;
+    }
+
+    /* Remove any potential overflow from video */
+    video {
+        outline: none;
+    }
         </style>
     </head>
     <body>
