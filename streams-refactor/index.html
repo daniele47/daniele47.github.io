@@ -136,18 +136,8 @@ body {
             background: rgba(10, 10, 10, 0.98);
         }
 
-        /* Make navigation items larger for touch */
-        .nav-item {
-            min-width: 120px !important;
-        }
-
-        .nav-channel {
-            padding: 0.75rem 1rem !important;
-        }
-
-        .nav-label {
-            font-size: 0.9rem !important;
-            margin-bottom: 0.5rem !important;
+        #stream-channel-prev #stream-channel-prev {
+            display: none;
         }
     }
 
@@ -230,79 +220,6 @@ body {
         font-weight: 600;
     }
 
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        #stream-home {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            padding: 1rem;
-        }
-
-        #stream-home a {
-            padding: 1rem;
-            min-height: 140px;
-        }
-
-        #stream-home img {
-            width: 60px;
-            height: 60px;
-        }
-
-        #stream-channel-nav {
-            padding: 0.5rem 1rem;
-            flex-direction: column;
-            gap: 0.5rem;
-            background: rgba(10, 10, 10, 0.98);
-        }
-
-        .nav-item {
-            min-width: 100%;
-        }
-
-        .nav-channel {
-            max-width: 100%;
-            padding: 0.75rem;
-        }
-
-        .channel-name {
-            font-size: 0.85rem;
-        }
-
-        .nav-label {
-            font-size: 0.75rem;
-            text-align: center;
-        }
-
-        /* Always show navigation on mobile */
-        @media (hover: none) and (pointer: coarse) {
-            #stream-channel-nav {
-                opacity: 1 !important;
-                position: relative;
-                background: var(--bg-secondary);
-                border-top: 1px solid var(--border-color);
-            }
-
-            #stream-channel-video {
-                height: calc(100vh - 200px);
-            }
-        }
-    }
-
-    /* Tablet Responsive */
-    @media (max-width: 1024px) and (min-width: 769px) {
-        #stream-home {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        }
-
-        #stream-channel-nav {
-            padding: 1rem;
-        }
-
-        .nav-item {
-            min-width: 120px;
-        }
-    }
-
     /* Loading state for video */
     #stream-channel-video::-webkit-media-controls {
         opacity: 0;
@@ -311,50 +228,6 @@ body {
 
     #stream-channel-video:hover::-webkit-media-controls {
         opacity: 1;
-    }
-
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--bg-secondary);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--bg-tertiary);
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #444444;
-    }
-
-    /* Focus states for accessibility */
-    a:focus-visible,
-    .nav-channel:focus-visible {
-        outline: 2px solid #666666;
-        outline-offset: 2px;
-    }
-
-    /* Error state for broken images */
-    img[src*="about:blank"] {
-        opacity: 0.3;
-        background: var(--bg-secondary);
-        padding: 4px;
-    }
-
-    /* Animation for page transitions */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     #stream-home a {
@@ -383,21 +256,21 @@ body {
         <div id="stream-channel" style="display:none">
             <video id="stream-channel-video" width="100" controls autoplay></video>
             <div id="stream-channel-nav">
-                <div class="nav-item">
+                <div id="stream-channel-prev" class="nav-item">
                     <div class="nav-label">go to previous channel</div>
                     <a id="stream-channel-prev-link" href="" class="nav-channel">
                         <span id="stream-channel-prev-name" class="channel-name"></span>
                         <img id="stream-channel-prev-icon" src="about:blank" alt="" class="channel-icon">
                     </a>
                 </div>
-                <div class="nav-item">
+                <div id="stream-channel-home" class="nav-item">
                     <div class="nav-label">go to channel list</div>
-                    <a href="#" class="nav-channel">
+                    <a id="stream-channel-home-link" href="#" class="nav-channel">
                         <span id="stream-channel-home-name" class="channel-name"></span>
                         <img id="stream-channel-home-icon" src="about:blank" alt="" class="channel-icon">
                     </a>
                 </div>
-                <div class="nav-item">
+                <div id="stream-channel-next" class="nav-item">
                     <div class="nav-label">go to next channel</div>
                     <a id="stream-channel-next-link" href="" class="nav-channel">
                         <span id="stream-channel-next-name" class="channel-name"></span>
