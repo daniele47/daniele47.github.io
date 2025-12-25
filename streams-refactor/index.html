@@ -179,10 +179,7 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
             function run_stream(url, video) {
                 stop_stream(video)
                 if (Hls.isSupported()) {
-                    var hls = new Hls({
-                        enableWorker: true,
-                        lowLatencyMode: true,
-                    })
+                    var hls = new Hls({})
                     video.hls = hls
                     hls.loadSource(url)
                     hls.attachMedia(video)
