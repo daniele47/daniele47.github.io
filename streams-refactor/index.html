@@ -10,12 +10,17 @@
 /* TODO */
 img {width: 50px;} /* TEMPORARY, FOR TESTING! */
 #stream-channel-nav {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    position: absolute;
 }
-
-#stream-channel-nav:hover {
-    opacity: 1;
+video{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    object-fit: contain;
+    display: block;
 }
         </style>
     </head>
@@ -177,75 +182,37 @@ img {width: 50px;} /* TEMPORARY, FOR TESTING! */
 
             // use hls to launch the stream
             function run_stream(url, video) {
-                stop_stream(video)
                 if (Hls.isSupported()) {
-                    var hls = new Hls({})
-                    video.hls = hls
-                    hls.loadSource(url)
-                    hls.attachMedia(video)
+                    var hls = new Hls();
+                    video.hls = hls;
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
                     hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        video.play().catch(e => {
-                            console.log("Autoplay prevented:", e)
-                            video.controls = true
-                        })
-                    })
-                    hls.on(Hls.Events.ERROR, function(event, data) {
-                        console.error("HLS error:", data)
-                        if (data.fatal) {
-                            switch(data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    console.log("Network error - not recovering")
-                                    break
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    console.log("Media error - not recovering")
-                                    break
-                                default:
-                                    console.log("Fatal error - not recovering")
-                                    break
-                            }
-                        }
-                    })
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                    });
                 }
                 else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url
+                    video.src = url;
                     video.addEventListener('loadedmetadata', function() {
-                        video.play().catch(e => {
-                            console.log("Autoplay prevented:", e)
-                            video.controls = true
-                        })
-                    }, { once: true })
-                    video.addEventListener('error', function(e) {
-                        console.error("Native HLS error:", e)
-                    }, { once: true })
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                    });
                 } else {
-                    alert("Your browser doesn't support HLS streaming.")
+                    alert("Your browser doesn't support HLS streaming.");
                 }
             }
 
-            // nuke the hls stream, to make sure it's fully gone
+            // fully and violently stop playing the stream 
             function stop_stream(video) {
                 if (video.hls) {
-                    video.hls.stopLoad()
-                    video.hls.detachMedia()
-                    video.hls.destroy()
-                    video.hls = null
+                    video.hls.destroy();
+                    video.hls = null;
                 }
-                video.pause()
-                video.currentTime = 0
+                video.pause();
+                video.currentTime = 0;
                 video.removeAttribute('src')
-                video.load()
-                video.pause()
-                setTimeout(() => {
-                    video.load()
-                    video.currentTime = 0
-                    setTimeout(() => {
-                        video.load()
-                    }, 100)
-                }, 100)
-                if (video.srcObject) {
-                    video.srcObject.getTracks().forEach(track => track.stop())
-                    video.srcObject = null
-                }
+                video.load();
+                video.pause();
+                setTimeout(() => video.load(), 100);
             }
 
             // initialize channel list
