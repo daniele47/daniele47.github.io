@@ -10,8 +10,31 @@
         </style>
     </head>
     <body>
-        <div id="stream-list" style="display:none"></div>
-        <video id="stream-video" style="display:none" width="100" controls autoplay></video>
+        <div id="stream-home" style="display:none"></div>
+        <div id="stream-channel" style="display:none">
+            <video id="stream-channel-video" width="100" controls autoplay></video>
+            <div class="nav-item" id="stream-channel-prev">
+                <div class="nav-label">go to previous channel</div>
+                <a id="stream-channel-prev-link" href="" class="nav-channel">
+                    <span id="stream-channel-prev-name" class="channel-name"></span>
+                    <img id="stream-channel-prev-icon" src="" alt="" class="channel-icon">
+                </a>
+            </div>
+            <div class="nav-item" id="stream-channel-home">
+                <div class="nav-label">go to homeious channel</div>
+                <a id="stream-channel-home-link" href="" class="nav-channel">
+                    <span id="stream-channel-home-name" class="channel-name"></span>
+                    <img id="stream-channel-home-icon" src="" alt="" class="channel-icon">
+                </a>
+            </div>
+            <div class="nav-item" id="stream-channel-next">
+                <div class="nav-label">go to nextious channel</div>
+                <a id="stream-channel-next-link" href="" class="nav-channel">
+                    <span id="stream-channel-next-name" class="channel-name"></span>
+                    <img id="stream-channel-next-icon" src="" alt="" class="channel-icon">
+                </a>
+            </div>
+        </div>
         <script>
             const elem_list = document.getElementById("stream-list")
             const elem_video = document.getElementById("stream-video")
