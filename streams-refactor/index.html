@@ -13,22 +13,22 @@
         <div id="stream-home" style="display:none"></div>
         <div id="stream-channel" style="display:none">
             <video id="stream-channel-video" width="100" controls autoplay></video>
-            <div class="nav-item" id="stream-channel-prev">
+            <div class="nav-item">
                 <div class="nav-label">go to previous channel</div>
                 <a id="stream-channel-prev-link" href="" class="nav-channel">
                     <span id="stream-channel-prev-name" class="channel-name"></span>
                     <img id="stream-channel-prev-icon" src="about:blank" alt="" class="channel-icon">
                 </a>
             </div>
-            <div class="nav-item" id="stream-channel-home">
-                <div class="nav-label">go to homeious channel</div>
-                <a id="stream-channel-home-link" href="" class="nav-channel">
+            <div class="nav-item">
+                <div class="nav-label">go to channel list</div>
+                <a href="#" class="nav-channel">
                     <span id="stream-channel-home-name" class="channel-name"></span>
                     <img id="stream-channel-home-icon" src="about:blank" alt="" class="channel-icon">
                 </a>
             </div>
-            <div class="nav-item" id="stream-channel-next">
-                <div class="nav-label">go to nextious channel</div>
+            <div class="nav-item">
+                <div class="nav-label">go to next channel</div>
                 <a id="stream-channel-next-link" href="" class="nav-channel">
                     <span id="stream-channel-next-name" class="channel-name"></span>
                     <img id="stream-channel-next-icon" src="about:blank" alt="" class="channel-icon">
@@ -37,8 +37,17 @@
         </div>
         <script>
             const elem_list = document.getElementById("stream-list")
-            const elem_video = document.getElementById("stream-video")
-            const elem_nav = document.getElementById("channel-nav")
+            const elem_channel = document.getElementById("stream-channel")
+            const elem_channel_video = document.getElementById("stream-channel-video")
+            const elem_channel_prev_link = document.getElementById("stream-channel-prev-link")
+            const elem_channel_prev_name = document.getElementById("stream-channel-prev-name")
+            const elem_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
+            const elem_channel_home_link = document.getElementById("stream-channel-home-link")
+            const elem_channel_home_name = document.getElementById("stream-channel-home-name")
+            const elem_channel_home_icon = document.getElementById("stream-channel-home-icon")
+            const elem_channel_next_link = document.getElementById("stream-channel-next-link")
+            const elem_channel_next_name = document.getElementById("stream-channel-next-name")
+            const elem_channel_next_icon = document.getElementById("stream-channel-next-icon")
 
             const channels = [{
                 "id": "rai1",
