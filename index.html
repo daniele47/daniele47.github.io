@@ -1,111 +1,80 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-         body {
-            background: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Website</title>
+        <style>
+/* Base styles */
+body {
+    background: #111;
+    color: #fff;
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+/* Remove list bullets and spacing */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* List items */
+li {
+    background: #222;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Images */
+img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Links */
+a {
+    color: #4dabf7;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+a:hover {
+    color: #74c0fc;
+    text-decoration: underline;
+}
+
+    /* Mobile fix */
+    @media (max-width: 600px) {
+        body {
+            padding: 10px;
         }
-        
-        .links {
-            display: flex;
+
+        li {
             flex-direction: column;
-            gap: 25px;
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
+            text-align: center;
+            gap: 10px;
         }
-        
-        .link {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            text-decoration: none;
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            transition: background 0.2s;
-            background: #222;
-        }
-        
-        .link:hover {
-            background: #333;
-        }
-        
-        .icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        
-        .name {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 600px) {
-            .link {
-                padding: 20px;
-                gap: 20px;
-            }
-            
-            .icon {
-                width: 56px;
-                height: 56px;
-            }
-            
-            .name {
-                font-size: 24px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="links" id="links"></div>
-
-    <script>
-        const link = document.createElement('link')
-        link.rel = 'icon'
-        link.type = 'image/png'
-        link.href = "https://upload.wikimedia.org/wikipedia/commons/3/37/Internet_icon.png"
-        document.head.appendChild(link)
-
-        const data = [
-            {
-                "name" : "Streams",
-                "url": "./streams",
-                "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Acquisition_%28video%29.png"
-            }
-        ]
-
-        data.forEach(item => {
-            const container = document.getElementById('links');
-            const link = document.createElement('a');
-            link.href = item.url;
-            link.className = 'link';
-
-            const img = document.createElement('img');
-            img.src = item.icon;
-            img.className = 'icon';
-            img.alt = '';
-
-            const name = document.createElement('span');
-            name.textContent = item.name;
-            name.className = 'name';
-
-            link.appendChild(img);
-            link.appendChild(name);
-            container.appendChild(link);
-        })
-    </script>
-</body>
+    }
+        </style>
+    </head>
+    <body>
+        <ul>
+            <li>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Acquisition_%28video%29.png" alt="">
+                <a href="./streams">Stream</a>
+            </li>
+            <li>
+                <img src="Streams-refactor/favicon.png" alt="">
+                <a href="./streams">Stream REFACTOR [WIP]</a>
+            </li>
+        </ul>
+    </body>
 </html>
