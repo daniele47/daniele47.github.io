@@ -46,10 +46,8 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1.5rem;
     padding: 2rem;
-    max-width: 1400px;
     margin: 0 auto;
     overflow-y: auto;
-    height: 100vh;
 }
 
 #stream-home a {
@@ -203,51 +201,6 @@ body {
         background: var(--bg-secondary);
         padding: 2px;
         transition: var(--transition);
-    }
-
-    .nav-channel:hover .channel-icon {
-        transform: scale(1.05);
-    }
-
-    /* Center item (current channel) */
-    .nav-item:nth-child(2) .nav-channel {
-        background: var(--bg-tertiary);
-        border-color: var(--border-color);
-    }
-
-    .nav-item:nth-child(2) .channel-name {
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    /* Loading state for video */
-    #stream-channel-video::-webkit-media-controls {
-        opacity: 0;
-        transition: var(--transition);
-    }
-
-    #stream-channel-video:hover::-webkit-media-controls {
-        opacity: 1;
-    }
-
-    #stream-home a {
-        animation: fadeIn 0.3s ease forwards;
-        animation-delay: calc(var(--item-index, 0) * 0.05s);
-    }
-
-    /* Make sure nothing can cause vertical scroll */
-    #stream-home {
-        scrollbar-width: thin;
-        scrollbar-color: var(--bg-tertiary) var(--bg-secondary);
-    }
-
-    #stream-home:focus-visible {
-        outline: none;
-    }
-
-    /* Remove any potential overflow from video */
-    video {
-        outline: none;
     }
         </style>
     </head>
