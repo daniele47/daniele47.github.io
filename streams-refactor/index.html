@@ -5,6 +5,7 @@
         <meta name="color-scheme" content="dark light">
         <link rel="icon" href="./favicon.png" type="image/png">
         <title>TV Streams</title>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
         <style>
 /* TODO */
         </style>
@@ -36,6 +37,7 @@
             </div>
         </div>
         <script>
+            // DOM elements
             const elem_list = document.getElementById("stream-list")
             const elem_channel = document.getElementById("stream-channel")
             const elem_channel_video = document.getElementById("stream-channel-video")
@@ -49,6 +51,7 @@
             const elem_channel_next_name = document.getElementById("stream-channel-next-name")
             const elem_channel_next_icon = document.getElementById("stream-channel-next-icon")
 
+            // channels data
             const channels = [{
                 "id": "rai1",
                 "name": "Rai 1",
@@ -161,8 +164,86 @@
                 "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Rai_Storia_-_Logo_2017.svg"
             }]
 
+            // use hls to launch the stream
+            function run_stream(url, video) {
+                stop_stream(video)
+                if (Hls.isSupported()) {
+                    var hls = new Hls({
+                        enableWorker: true,
+                        lowLatencyMode: true,
+                    })
+                    video.hls = hls
+                    hls.loadSource(url)
+                    hls.attachMedia(video)
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(e => {
+                            console.log("Autoplay prevented:", e)
+                            video.controls = true
+                        })
+                    })
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("HLS error:", data)
+                        if (data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.log("Network error - trying to recover")
+                                    hls.startLoad()
+                                    break
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.log("Media error - trying to recover")
+                                    hls.recoverMediaError()
+                                    break
+                                default:
+                                    console.log("Fatal error - cannot recover")
+                                    stop_stream(video)
+                                    break
+                            }
+                        }
+                    })
+                }
+                else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url
+                    video.removeEventListener('loadedmetadata', video._loadedMetaHandler)
+                    video._loadedMetaHandler = function() {
+                        video.play().catch(e => console.log("Autoplay prevented:", e))
+                    }
+                    video.addEventListener('loadedmetadata', video._loadedMetaHandler)
+                    video.addEventListener('error', function(e) {
+                        console.error("Native HLS error:", e)
+                    })
+                } else {
+                    alert("Your browser doesn't support HLS streaming.")
+                }
+            }
+
+            // nuke the hls stream, to make sure it's fully gone
+            function stop_stream(video) {
+                if (video.hls) {
+                    video.hls.stopLoad()
+                    video.hls.detachMedia()
+                    video.hls.destroy()
+                    video.hls = null
+                }
+                video.pause()
+                video.currentTime = 0
+                video.removeAttribute('src')
+                video.load()
+                video.pause()
+                setTimeout(() => {
+                    video.load()
+                    video.currentTime = 0
+                    setTimeout(() => {
+                        video.load()
+                    }, 100)
+                }, 100)
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop())
+                    video.srcObject = null
+                }
+            }
+
             // initialize channel list
-            let html_string = '';
+            let html_string = ''
             for (const channel of channels) {
                 html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
             }
