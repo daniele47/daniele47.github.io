@@ -1,802 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="color-scheme" content="dark light">
+        <link rel="icon" href="./favicon.png" type="image/png">
+        <title>TV Streams</title>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <title>TV Stream</title>
-    <style>
-        /* --- Global Reset --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --bg-hover: #333333;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+    --transition: all 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: sans-serif;
+}
+
+/* Home Page Styles */
+#stream-home {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+#stream-home a {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition);
+    min-height: 180px;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#stream-home a:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-color);
+    transform: translateY(-2px);
+}
+
+#stream-home img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: brightness(0.9);
+    transition: var(--transition);
+}
+
+#stream-home a:hover img {
+    filter: brightness(1);
+    transform: scale(1.05);
+}
+
+/* Channel Page Styles */
+#stream-channel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 1;
+}
+
+#stream-channel-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+/* Navigation Bar - Show on channel hover */
+#stream-channel-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.75rem 2rem;
+    z-index: 1000;
+    opacity: 0;
+}
+
+/* Also show when hovering the navigation itself (for when it's already visible) */
+#stream-channel-nav:hover {
+    opacity: 1;
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 140px;
+}
+
+.nav-label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.nav-channel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition);
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+}
+
+.nav-channel:hover {
+    background: var(--bg-hover);
+    border-color: #444444;
+}
+
+.nav-channel:hover .channel-name {
+    color: var(--text-primary);
+}
+
+.channel-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.channel-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
+    padding: 2px;
+    transition: var(--transition);
+    background: #505050;
+}
+
+.nav-channel:hover .channel-icon {
+    transform: scale(1.1);
+}
+
+    @media (max-width: 768px) {
+        #stream-channel-prev,
+        #stream-channel-next {
+            display: none;
         }
-        html, body {
-            height: 100%;
+
+        #stream-channel-home {
+            flex: 1 1 100%;
         }
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background: #0c0c0f;
-            color: #e6e6e6;
-            font-family: system-ui, sans-serif;
-            overflow-x: hidden;
+
+        /* Make home grid show 2 columns on mobile */
+        #stream-home {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
         }
-        /* --- Stream List Grid --- */
-        #stream-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-            padding: 14px;
+
+        #stream-home a {
+            min-height: 120px;
+            padding: 1rem;
         }
-        /* List items - subtle hover with vertical lift */
-        #stream-list a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: #1a1a21;
-            padding: 14px 10px;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #e6e6e6;
-            border: 1px solid #2a2a33;
-            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+
+        #stream-home img {
+            width: 50px;
+            height: 50px;
         }
-        #stream-list a:hover {
-            background: #24242b;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            transform: translateY(-3px);
-        }
-        #stream-list img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
-            transition: transform 0.15s ease;
-        }
-        #stream-list a:hover img {
-            transform: translateY(-3px);
-        }
-        /* --- Channel Navigation Overlay --- */
-        #channel-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            background: rgba(26, 26, 33, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(42, 42, 51, 0.5);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        opacity 0.3s ease;
-            transform: translateY(0);
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+        #stream-channel-nav {
             opacity: 1;
-            min-height: 44px;
         }
-        
-        /* Hidden state */
-        #channel-nav.hidden {
-            transform: translateY(-100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        /* Navigation container - responsive */
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            width: 100%;
-            padding: 4px 12px;
-        }
-        
-        /* Individual nav items */
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 2px 4px;
-            min-height: 36px;
-        }
-        
-        /* Label above buttons */
-        .nav-label {
-            font-size: 10px;
-            color: #888;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-            height: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Channel buttons - all same style */
-        .nav-channel {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-            width: 100%;
-            text-decoration: none;
-            color: #e6e6e6;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.2s ease;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(42, 42, 51, 0.3);
-        }
-        
-        .nav-channel:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(42, 42, 51, 0.5);
-        }
-        
-        /* Center button text and icon */
-        .nav-channel span,
-        .nav-channel img {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .channel-name {
-            font-size: 12px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100px;
-        }
-        
-        .channel-icon {
-            width: 22px;
-            height: 22px;
-            flex-shrink: 0;
-            border-radius: 3px;
-        }
-        
-        /* Current channel (home button) - keep the same style */
-        .home-button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(42, 42, 51, 0.3);
-            cursor: pointer;
-        }
-        
-        .home-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(42, 42, 51, 0.5);
-        }
-        
-        /* Centered channel info element - FIXED position to viewport - MINIMAL SIZE */
-        .channel-info-center {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            background: rgba(26, 26, 33, 0.95);
-            border: 1px solid rgba(42, 42, 51, 0.3);
-            z-index: 1002;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            min-width: auto;
-            width: auto;
-            max-width: none;
-        }
-        
-        .channel-info-center.show {
-            opacity: 1;
-        }
-        
-        .channel-info-center .channel-label {
-            font-size: 10px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-            height: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-        
-        .channel-info-center .channel-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-        
-        .channel-info-center .channel-icon {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .channel-info-center .channel-name {
-            font-size: 13px;
-            font-weight: 500;
-            max-width: none;
-            white-space: nowrap;
-        }
-        
-        /* Remove all responsive width constraints - let it size to content */
-        @media (max-width: 768px) {
-            .nav-container {
-                justify-content: center;
-            }
-            
-            /* Hide prev/next on small screens */
-            .nav-item:first-child,
-            .nav-item:last-child {
-                display: none;
-            }
-            
-            /* Center home button - fill entire width */
-            .nav-item:nth-child(2) {
-                flex: 1;
-                width: 100%;
-                max-width: 100%;
-                padding: 2px 0;
-            }
-            
-            /* Make the home button fill its container */
-            .nav-item:nth-child(2) .nav-channel {
-                width: 100%;
-                max-width: 100%;
-                margin: 0;
-            }
-            
-            /* Adjust label for full width */
-            .nav-item:nth-child(2) .nav-label {
-                width: 100%;
-                padding: 0 8px;
-            }
-            
-            /* Remove responsive constraints for channel info */
-            .channel-info-center {
-                width: auto;
-                max-width: none;
-            }
-        }
-        
-        @media (min-width: 769px) {
-            /* Remove responsive constraints for channel info */
-            .channel-info-center {
-                width: auto;
-                max-width: none;
-            }
-        }
-        
-        /* --- Video Layout --- */
-        body:has(#stream-video:not([style*="display: none"])) {
-            flex-direction: column;
-        }
-        #stream-video {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            object-fit: contain;
-            display: block;
-        }
-        
-        /* --- Debug Button --- */
-        #debug-button {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 1001;
-            background: rgba(26, 26, 33, 0.9);
-            border: 1px solid #3a3a4a;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 2px 6px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        
-        #debug-button-icon {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            filter: brightness(0.8) saturate(1.2);
-            transition: filter 0.25s ease;
-        }
-        
-        #debug-button:hover {
-            background: rgba(36, 36, 43, 0.95);
-            border-color: #4a4a5a;
-            box-shadow: 
-                0 4px 12px rgba(138, 138, 255, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.12);
-            transform: translateY(-1px) scale(1.05);
-        }
-        
-        #debug-button:hover #debug-button-icon {
-            filter: brightness(1) saturate(1.5);
-        }
-        
-        #debug-button:active {
-            transform: translateY(0) scale(1);
-            box-shadow: 
-                0 1px 3px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-        
-        /* --- Smooth Fade --- */
-        #stream-list,
-        #stream-video {
-            transition: opacity 0.25s ease;
-        }
-        
-        [style*="display: none"] {
-            opacity: 0;
-        }
-        
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #444;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #111;
-        }
-        
-        /* Reset any outline or box‑shadow the OS may add */
-        video,
-        video:focus,
-        video:focus-visible,
-        video::-webkit-media-controls-panel,
-        video::-webkit-media-controls-enclosure,
-        video::-webkit-media-controls-fullscreen-button,
-        video::-webkit-media-controls-play-button,
-        video::-webkit-media-controls-volume-slider,
-        video::-webkit-media-controls-mute-button,
-        video::-webkit-media-controls-timeline,
-        video::-webkit-media-controls-current-time-display,
-        video::-webkit-media-controls-time-remaining-display,
-        video::-webkit-media-controls-toggle-closed-captions-button,
-        video::-webkit-media-controls-rewind-button,
-        video::-webkit-media-controls-forward-button,
-        video::-webkit-media-controls-fullscreen-button,
-        video::-webkit-media-controls-overlay-play-button,
-        video::-webkit-media-controls-panel,
-        video::-webkit-media-controls {
-            outline: none !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
+    }
+        </style>
+    </head>
+    <body>
+        <div id="stream-home" style="display:none"></div>
+        <div id="stream-channel" style="display:none">
+            <video id="stream-channel-video" width="100" controls autoplay></video>
+            <div id="stream-channel-nav">
+                <div id="stream-channel-prev" class="nav-item">
+                    <div class="nav-label">go to previous channel</div>
+                    <a id="stream-channel-prev-link" href="" class="nav-channel">
+                        <span id="stream-channel-prev-name" class="channel-name"></span>
+                        <img id="stream-channel-prev-icon" src="about:blank" alt="" class="channel-icon">
+                    </a>
+                </div>
+                <div id="stream-channel-home" class="nav-item">
+                    <div class="nav-label">go to channel list</div>
+                    <a id="stream-channel-home-link" href="#" class="nav-channel">
+                        <span id="stream-channel-home-name" class="channel-name"></span>
+                        <img id="stream-channel-home-icon" src="about:blank" alt="" class="channel-icon">
+                    </a>
+                </div>
+                <div id="stream-channel-next" class="nav-item">
+                    <div class="nav-label">go to next channel</div>
+                    <a id="stream-channel-next-link" href="" class="nav-channel">
+                        <span id="stream-channel-next-name" class="channel-name"></span>
+                        <img id="stream-channel-next-icon" src="about:blank" alt="" class="channel-icon">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <script>
+            // DOM elements
+            const stream_home = document.getElementById("stream-home")
+            const stream_channel = document.getElementById("stream-channel")
+            const stream_channel_video = document.getElementById("stream-channel-video")
+            const stream_channel_nav = document.getElementById("stream-channel-nav")
+            const stream_channel_prev_link = document.getElementById("stream-channel-prev-link")
+            const stream_channel_prev_name = document.getElementById("stream-channel-prev-name")
+            const stream_channel_prev_icon = document.getElementById("stream-channel-prev-icon")
+            const stream_channel_home_name = document.getElementById("stream-channel-home-name")
+            const stream_channel_home_icon = document.getElementById("stream-channel-home-icon")
+            const stream_channel_next_link = document.getElementById("stream-channel-next-link")
+            const stream_channel_next_name = document.getElementById("stream-channel-next-name")
+            const stream_channel_next_icon = document.getElementById("stream-channel-next-icon")
 
-        /* Some webOS builds add a class called "focus-ring" */
-        video.focus-ring,
-        video[data-focused],
-        video[data-focus-visible-added] {
-            outline: none !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
-    </style> 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-</head>
+            // channels data
+            const channels = [{
+                "id": "rai1",
+                "name": "Rai 1",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/rai1/browser-HLS8/rai1.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Rai_1_-_Logo_2016.svg"
+            }, {
+                "id": "rai2",
+                "name": "Rai 2",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/rai2/browser-HLS8/rai2.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/9/99/Rai_2_-_Logo_2016.svg"
+            }, {
+                "id": "rai3",
+                "name": "Rai 3",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/rai3/browser-HLS8/rai3.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/4/47/Rai_3_-_Logo_2016.svg"
+            }, {
+                "id": "rete4",
+                "name": "Rete 4",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-r4/r4-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Rete_4_-_Logo_2018.svg"
+            }, {
+                "id": "canale5",
+                "name": "Canale 5",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-c5/c5-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/0/02/Canale_5_-_2018_logo.svg"
+            }, {
+                "id": "italia1",
+                "name": "Italia 1",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-i1/i1-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Italia_1_logo.svg"
+            }, {
+                "id": "la7",
+                "name": "La 7",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/la7/browser-HLS8/la7.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/0/02/LA7_-_Logo_2011.svg"
+            }, {
+                "id": "nove",
+                "name": "Nove",
+                "url": "https://d31mw7o1gs0dap.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-y5pbi2sq9r609/NOVE_IT.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Nove_-_Logo_2017.svg"
+            }, {
+                "id": "mediaset20",
+                "name": "Mediaset 20",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-lb/lb-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/5/5c/20_Mediaset_2018.svg"
+            }, {
+                "id": "iris",
+                "name": "Iris",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-ki/ki-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/9/98/Iris_logo_2013.svg"
+            }, {
+                "id": "27",
+                "name": "27",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-ts/ts-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/2/26/Twentyseven_logo.svg"
+            }, {
+                "id": "la7d",
+                "name": "La7d",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/la7d/browser-HLS8/la7d.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8b/LA7d_%282024%29.svg"
+            }, {
+                "id": "realtime",
+                "name": "Real Time",
+                "url": "https://d3562mgijzx0zq.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-kizqtzpvvl3i8/Realtime_IT.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Real_Time_logo.svg"
+            }, {
+                "id": "foodnetwork",
+                "name": "Food Network",
+                "url": "https://dk3okdd5036kz.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-o4pw0nc02sthz/Foodnetwork_IT.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/0/06/Food_Network_logo.svg"
+            }, {
+                "id": "cine34",
+                "name": "Cine34",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-b6/b6-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Cine34_logo.svg"
+            }, {
+                "id": "focus",
+                "name": "Focus",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-fu/fu-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Focus_channel.png"
+            }, {
+                "id": "giallo",
+                "name": "Giallo",
+                "url": "https://d9fqo6nfqlv2h.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ulukbrgm1n3yb/Giallo_IT.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Giallo_-_Logo_2014.svg"
+            }, {
+                "id": "topcrime",
+                "name": "Top Crime",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-lt/lt-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Top_Crime_-_Logo_2013.svg"
+            }, {
+                "id": "italia2",
+                "name": "Italia 2",
+                "url": "https://live02-seg.msf.cdn.mediaset.net/live/ch-i2/i2-clr.isml/index.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Logo_Italia2.svg"
+            }, {
+                "id": "raiscuola",
+                "name": "Rai Scuola",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/raiscuola/browser-HLS8/raiscuola.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/1/11/Rai_Scuola_-_Logo_2017.svg"
+            }, {
+                "id": "raisport",
+                "name": "Rai Sport",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/raisport1/browser-HLS8/raisport1.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Rai_Sport_-_Logo_2022.svg"
+            }, {
+                "id": "raistoria",
+                "name": "Rai Storia",
+                "url": "https://viamotionhsi.netplus.ch/live/eds/raistoria/browser-HLS8/raistoria.m3u8",
+                "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Rai_Storia_-_Logo_2017.svg"
+            }]
 
-<body>
-    <script>
-        // Global variables for channel data and navigation
-        let channelData = [];
-        let currentChannelIndex = -1;
-        
-        // Auto-hide functionality
-        let hideTimeout;
-        let isMouseMoving = false;
-        let mouseTimer;
-        let isHoveringOverControls = false; // Track if hovering over navigation controls
-
-        function setupHoverListeners() {
-            const channelNav = document.getElementById('channel-nav');
-            if (!channelNav) return;
-            
-            // Get all navigation channel links
-            const navChannels = channelNav.querySelectorAll('.nav-channel');
-            
-            navChannels.forEach(link => {
-                // Remove existing listeners to avoid duplicates
-                link.removeEventListener('mouseenter', handleNavMouseEnter);
-                link.removeEventListener('mouseleave', handleNavMouseLeave);
-                
-                // Add new listeners
-                link.addEventListener('mouseenter', handleNavMouseEnter);
-                link.addEventListener('mouseleave', handleNavMouseLeave);
-            });
-        }
-
-        function handleNavMouseEnter() {
-            isHoveringOverControls = true;
-            clearTimeout(hideTimeout); // Immediately clear any hide timeout
-        }
-
-        function handleNavMouseLeave() {
-            isHoveringOverControls = false;
-            // Reset the hide timer when mouse leaves controls
-            resetHideTimer();
-        }
-        
-        function resetHideTimer() {
-            clearTimeout(hideTimeout);
-            
-            // Don't hide if hovering over navigation controls
-            if (isHoveringOverControls) return;
-            
-            // Show controls immediately when there's activity
-            const channelNav = document.getElementById('channel-nav');
-            if (channelNav) {
-                channelNav.classList.remove('hidden');
-                // Also show the channel info
-                const channelInfo = document.querySelector('.channel-info-center');
-                if (channelInfo) {
-                    channelInfo.classList.add('show');
+            // use hls to launch the stream
+            function run_stream(url, video) {
+                if (Hls.isSupported()) {
+                    var hls = new Hls();
+                    video.hls = hls;
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                    });
                 }
-            }
-            
-            // Hide after 3 seconds of inactivity
-            hideTimeout = setTimeout(() => {
-                const channelNav = document.getElementById('channel-nav');
-                if (channelNav && !channelNav.classList.contains('hidden') && 
-                    window.location.hash !== '' && window.location.hash !== '#') {
-                    channelNav.classList.add('hidden');
-                    // Also hide the channel info
-                    const channelInfo = document.querySelector('.channel-info-center');
-                    if (channelInfo) {
-                        channelInfo.classList.remove('show');
-                    }
-                }
-            }, 3000);
-        }
-        
-        function handleMouseMove() {
-            isMouseMoving = true;
-            clearTimeout(mouseTimer);
-            resetHideTimer();
-            
-            mouseTimer = setTimeout(() => {
-                isMouseMoving = false;
-            }, 100);
-        }
-        
-        function handleVideoClick() {
-            const channelNav = document.getElementById('channel-nav');
-            if (channelNav) {
-                if (channelNav.classList.contains('hidden')) {
-                    channelNav.classList.remove('hidden');
-                    resetHideTimer();
+                else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('loadedmetadata', function() {
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                    });
                 } else {
-                    channelNav.classList.add('hidden');
-                    // Also hide the channel info
-                    const channelInfo = document.querySelector('.channel-info-center');
-                    if (channelInfo) {
-                        channelInfo.classList.remove('show');
-                    }
-                    // Reset hover state when manually hiding
-                    isHoveringOverControls = false;
+                    alert("Your browser doesn't support HLS streaming.");
                 }
             }
-        }
-        
-        // Function to update channel navigation
-        function updateChannelNavigation() {
-            const channelNav = document.getElementById('channel-nav');
-            if (!channelNav || !channelData.length) return;
-            
-            const navContainer = channelNav.querySelector('.nav-container');
-            
-            if (currentChannelIndex === -1) {
-                // We're at home - show simple home button
-                navContainer.innerHTML = `
-                    <div class="nav-item" style="display: none;"></div>
-                    <div class="nav-item">
-                        <div class="nav-label">current view</div>
-                        <a href="#" class="nav-channel home-button">
-                            <span class="channel-name">Channels</span>
-                            <img src="${window.videoIcon || ''}" alt="" class="channel-icon">
-                        </a>
-                    </div>
-                    <div class="nav-item" style="display: none;"></div>
-                `;
-                
-                // Hide channel info when at home
-                const channelInfo = document.querySelector('.channel-info-center');
-                if (channelInfo) {
-                    channelInfo.classList.remove('show');
-                }
-            } else {
-                // We're watching a channel, show full navigation
-                const channelCount = channelData.length;
-                
-                // Calculate previous and next indices with cycling
-                const prevIndex = (currentChannelIndex - 1 + channelCount) % channelCount;
-                const nextIndex = (currentChannelIndex + 1) % channelCount;
-                
-                // Get channels
-                const prevChannel = channelData[prevIndex];
-                const currentChannel = channelData[currentChannelIndex];
-                const nextChannel = channelData[nextIndex];
-                
-                navContainer.innerHTML = `
-                    <div class="nav-item">
-                        <div class="nav-label">go to previous channel</div>
-                        <a href="#${prevChannel.id}" class="nav-channel">
-                            <span class="channel-name">${prevChannel.name}</span>
-                            <img src="${prevChannel.icon}" alt="" class="channel-icon">
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-label">go to channel list</div>
-                        <a href="#" class="nav-channel home-button">
-                            <span class="channel-name">Channels</span>
-                            <img src="${window.videoIcon || ''}" alt="" class="channel-icon">
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <div class="nav-label">go to next channel</div>
-                        <a href="#${nextChannel.id}" class="nav-channel">
-                            <span class="channel-name">${nextChannel.name}</span>
-                            <img src="${nextChannel.icon}" alt="" class="channel-icon">
-                        </a>
-                    </div>
-                `;
-                
-                // Update or create channel info element (append to body for proper positioning)
-                let channelInfo = document.querySelector('.channel-info-center');
-                if (!channelInfo) {
-                    channelInfo = document.createElement('div');
-                    channelInfo.className = 'channel-info-center';
-                    document.body.appendChild(channelInfo);
-                }
-                
-                channelInfo.innerHTML = `
-                    <div class="channel-label">CURRENT CHANNEL</div>
-                    <div class="channel-content">
-                        <span class="channel-name">${currentChannel.name}</span>
-                        <img src="${currentChannel.icon}" alt="" class="channel-icon">
-                    </div>
-                `;
-                
-                // Show the channel info only if overlay is visible
-                if (!channelNav.classList.contains('hidden')) {
-                    channelInfo.classList.add('show');
-                }
-            }
-            
-            // Set up hover listeners after updating the navigation
-            setupHoverListeners();
-        }
 
-        function run_stream(url, video) {
-            // Add shortcuts when stream starts
-            function handleKeydown(e) {
-                // Don't trigger if user is typing in an input field
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                
-                switch(e.key) {
-                    case 'f':
-                        // Toggle fullscreen
-                        if (!document.fullscreenElement) {
-                            video.requestFullscreen().catch(err => console.error(err));
-                        } else {
-                            document.exitFullscreen();
-                        }
-                        break;
-                    case 'm':
-                        // Toggle mute
-                        video.muted = !video.muted;
-                        break;
-                    case 'k':
-                        // Play/pause
-                        video.paused ? video.play() : video.pause();
-                        break;
-                    case 'j':
-                        // Seek -5 seconds
-                        video.currentTime = Math.max(0, video.currentTime - 5);
-                        break;
-                    case 'l':
-                        // Seek +5 seconds
-                        video.currentTime = Math.min(video.duration, video.currentTime + 5);
-                        break;
+            // fully and violently stop playing the stream 
+            function stop_stream(video) {
+                if (video.hls) {
+                    video.hls.destroy();
+                    video.hls = null;
                 }
+                video.pause();
+                video.currentTime = 0;
+                video.removeAttribute('src')
+                video.load();
+                video.pause();
+                setTimeout(() => video.load(), 100);
             }
-            
-            // Store the handler on video for cleanup
-            video._keydownHandler = handleKeydown;
-            document.addEventListener('keydown', video._keydownHandler);
-            
-            // Add mouse move listener for video
-            document.addEventListener('mousemove', handleMouseMove);
-            // Add click listener to video to toggle controls
-            video.addEventListener('click', handleVideoClick);
-            
-            // Rest of your stream logic
-            if (Hls.isSupported()) {
-                var hls = new Hls();
-                video.hls = hls;
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(e => console.log("Autoplay prevented:", e));
-                });
+
+            // initialize channel list
+            let html_string = ''
+            for (const channel of channels) {
+                html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
             }
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play().catch(e => console.log("Autoplay prevented:", e));
-                });
-            } else {
-                alert("Your browser doesn't support HLS streaming.");
-            }
-            
-            // Update channel navigation
-            updateChannelNavigation();
-            
-            // Start the hide timer
-            resetHideTimer();
-        }
-        
-        function stop_stream(video) {
-            // Clear all timeouts
-            clearTimeout(hideTimeout);
-            clearTimeout(mouseTimer);
-            
-            // Remove event listeners
-            document.removeEventListener('mousemove', handleMouseMove);
-            video.removeEventListener('click', handleVideoClick);
-            
-            // Remove ALL shortcuts at once
-            if (video._keydownHandler) {
-                document.removeEventListener('keydown', video._keydownHandler);
-                video._keydownHandler = null;
-            }
-            // Rest of cleanup...
-            if (video.hls) {
-                video.hls.destroy();
-                video.hls = null;
-            }
-            // stronger pause handling since webos is weird
-            video.pause();
-            video.currentTime = 0;
-            video.removeAttribute('src')
-            video.load();
-            video.pause();
-            setTimeout(() => video.load(), 100);
-        }
-        
-        function set_display(elements, displayState) {
-            elements.forEach(elem => {
-                if (elem) elem.style.display = displayState;
+            stream_home.innerHTML = html_string
+
+            // change page based on the fragment
+            window.addEventListener('hashchange', function() {
+                const hash_channel_id = window.location.hash.slice(1);
+                const channel_index = channels.findIndex(item => item.id === hash_channel_id);
+                const channel = channels[channel_index]
+                if (channel_index === -1){ // home page
+                    history.replaceState(null, null, window.location.origin + window.location.pathname)
+                    document.title = "TV Streams"
+                    stream_home.style.display = ""
+                    stream_channel.style.display = "none"
+                    stop_stream(stream_channel_video)
+                } else { // channel page
+                    history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.hash)
+                    document.title = `${channel.name} Stream`
+                    stream_home.style.display = "none"
+                    stream_channel.style.display = ""
+                    const channel_prev = channels[(channel_index - 1 + channels.length) % channels.length]
+                    const channel_next = channels[(channel_index + 1) % channels.length]
+                    stream_channel_prev_link.href = `#${channel_prev.id}`
+                    stream_channel_prev_name.textContent = `${channel_prev.name}`
+                    stream_channel_prev_icon.src = `${channel_prev.icon}`
+                    stream_channel_home_name.textContent = `${channel.name}`
+                    stream_channel_home_icon.src = `${channel.icon}`
+                    stream_channel_next_link.href = `#${channel_next.id}`
+                    stream_channel_next_name.textContent = `${channel_next.name}`
+                    stream_channel_next_icon.src = `${channel_next.icon}`
+                    run_stream(channel.url, stream_channel_video)
+                }
             });
-        }
-    </script>
 
-    <div id="stream-list" style="display:none"></div>
-    <div id="channel-nav" style="display:none">
-        <div class="nav-container"></div>
-    </div>
-    <video id="stream-video" style="display:none" width="100%" controls autoplay></video>
-    <a id="debug-button" href="./debug.html" style="display: none"><img id="debug-button-icon" alt=""></a>
+            // force hashchange event to start at page load
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
 
-    <script>
-        fetch("./api/config.json")
-            .then(response => response.json())
-            .then(config_data => {
-                const video_icon = config_data.icon.video
-                window.videoIcon = video_icon;
-                const gear_icon = config_data.icon.gear
-                document.getElementById("debug-button-icon").setAttribute("src", gear_icon)
-
-                const link = document.createElement('link')
-                link.rel = 'icon'
-                link.type = 'image/png'
-                link.href = video_icon
-                document.head.appendChild(link)
-            })
-            .then(() => {
-                fetch("./api/channels.json")
-                    .then(response => response.json())
-                    .then(channel_data => {
-                        // Store channel data globally
-                        channelData = channel_data;
-
-                        const stream_list = document.getElementById("stream-list")
-                        const stream_video = document.getElementById("stream-video")
-                        const debug_button = document.getElementById("debug-button")
-                        const channel_nav = document.getElementById("channel-nav")
-
-                        // initialize stream list
-                        let html_string = '';
-                        for (const channel of channel_data) {
-                            html_string += `<a href="#${channel.id}"><img src="${channel.icon}" alt="">${channel.name}</a>`
-                        }
-                        stream_list.innerHTML = html_string
-
-                        // change page based on the fragment
-                        window.addEventListener('hashchange', function() {
-                            const searched_channel_id = window.location.hash.replace(/^#/, '');
-                            const channelIndex = channel_data.findIndex(c => c.id === searched_channel_id);
-
-                            if (channelIndex === -1) { 
-                                // home - clear timeouts and remove video listeners
-                                clearTimeout(hideTimeout);
-                                clearTimeout(mouseTimer);
-                                stream_video.removeEventListener('click', handleVideoClick);
-                                document.removeEventListener('mousemove', handleMouseMove);
-
-                                set_display([stream_list, debug_button], "")
-                                set_display([channel_nav, stream_video], "none")
-                                document.title = "TV Stream"
-                                stop_stream(stream_video)
-
-                                // Reset current channel index
-                                currentChannelIndex = -1;
-
-                                // Reset hover state
-                                isHoveringOverControls = false;
-
-                                // Update navigation for home view
-                                updateChannelNavigation();
-                            } else { 
-                                // valid channel -> render video
-                                currentChannelIndex = channelIndex;
-                                const channel = channel_data[channelIndex];
-
-                                set_display([stream_list, debug_button], "none")
-                                set_display([channel_nav, stream_video], "")
-                                document.title = channel.name + " Stream"
-                                run_stream(channel.url, stream_video)
-                            }
-                        });
-
-                        // force hashchange event to start at page load
-                        window.dispatchEvent(new HashChangeEvent('hashchange'));
-                    })
-            })
-    </script>
-</body>
+        </script>
+    </body>
 </html>
