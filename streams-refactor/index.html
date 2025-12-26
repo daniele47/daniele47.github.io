@@ -179,6 +179,33 @@ body {
     transform: scale(1.1);
 }
 
+@media (max-width: 768px) {
+    #stream-channel-prev,
+    #stream-channel-next {
+        display: none;
+    }
+
+    #stream-channel-home {
+        flex: 1 1 100%;
+    }
+
+    /* Make home grid show 2 columns on mobile */
+    #stream-home {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    #stream-home a {
+        min-height: 120px;
+        padding: 1rem;
+    }
+
+    #stream-home img {
+        width: 50px;
+        height: 50px;
+    }
+}
         </style>
     </head>
     <body>
