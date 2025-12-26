@@ -23,10 +23,17 @@
     --transition: all 0.3s ease;
 }
 
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #333333 #0a0a0a;
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: sans-serif;
+    overflow-y: overlay;
 }
 
 /* Home Page Styles */
@@ -183,73 +190,98 @@ body {
     transform: scale(1.1);
 }
 
-        @media (max-width: 768px) {
-            #stream-channel-prev,
-            #stream-channel-next {
-                display: none;
+            @media (max-width: 768px) {
+                #stream-channel-prev,
+                #stream-channel-next {
+                    display: none;
+                }
+
+                #stream-channel-home {
+                    flex: 1 1 100%;
+                }
+
+                /* Make home grid show 2 columns on mobile */
+                #stream-home {
+                    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                    gap: 1rem;
+                    padding: 1rem;
+                }
+
+                #stream-home a {
+                    min-height: 120px;
+                    padding: 1rem;
+                }
+
+                #stream-home img {
+                    width: 50px;
+                    height: 50px;
+                }
             }
 
-            #stream-channel-home {
-                flex: 1 1 100%;
+            @media (hover: none) and (pointer: coarse) {
+                #stream-channel-nav {
+                    opacity: 1;
+                }
             }
 
-            /* Make home grid show 2 columns on mobile */
-            #stream-home {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 1rem;
-                padding: 1rem;
-            }
-
-            #stream-home a {
-                min-height: 120px;
-                padding: 1rem;
-            }
-
-            #stream-home img {
-                width: 50px;
-                height: 50px;
-            }
+            /* Reset any outline or box‑shadow the OS may add */
+            video,
+        video:focus,
+        video:focus-visible,
+        video::-webkit-media-controls-panel,
+        video::-webkit-media-controls-enclosure,
+        video::-webkit-media-controls-fullscreen-button,
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls-volume-slider,
+        video::-webkit-media-controls-mute-button,
+        video::-webkit-media-controls-timeline,
+        video::-webkit-media-controls-current-time-display,
+        video::-webkit-media-controls-time-remaining-display,
+        video::-webkit-media-controls-toggle-closed-captions-button,
+        video::-webkit-media-controls-rewind-button,
+        video::-webkit-media-controls-forward-button,
+        video::-webkit-media-controls-fullscreen-button,
+        video::-webkit-media-controls-overlay-play-button,
+        video::-webkit-media-controls-panel,
+        video::-webkit-media-controls {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
 
-        @media (hover: none) and (pointer: coarse) {
-            #stream-channel-nav {
-                opacity: 1;
-            }
+        /* Some webOS builds add a class called "focus-ring" */
+        video.focus-ring,
+        video[data-focused],
+        video[data-focus-visible-added] {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
 
-        /* Reset any outline or box‑shadow the OS may add */
-        video,
-    video:focus,
-    video:focus-visible,
-    video::-webkit-media-controls-panel,
-    video::-webkit-media-controls-enclosure,
-    video::-webkit-media-controls-fullscreen-button,
-    video::-webkit-media-controls-play-button,
-    video::-webkit-media-controls-volume-slider,
-    video::-webkit-media-controls-mute-button,
-    video::-webkit-media-controls-timeline,
-    video::-webkit-media-controls-current-time-display,
-    video::-webkit-media-controls-time-remaining-display,
-    video::-webkit-media-controls-toggle-closed-captions-button,
-    video::-webkit-media-controls-rewind-button,
-    video::-webkit-media-controls-forward-button,
-    video::-webkit-media-controls-fullscreen-button,
-    video::-webkit-media-controls-overlay-play-button,
-    video::-webkit-media-controls-panel,
-    video::-webkit-media-controls {
-        outline: none !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px; /* For horizontal scrollbars if needed */
+        }
 
-    /* Some webOS builds add a class called "focus-ring" */
-    video.focus-ring,
-    video[data-focused],
-    video[data-focus-visible-added] {
-        outline: none !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; /* Same as your --bg-primary */
+            border-left: 1px solid #1a1a1a; /* Same as your --bg-secondary */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333333; /* Same as your --border-color */
+            border-radius: 6px;
+            border: 3px solid #0a0a0a; /* Creates padding effect */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444444; /* Slightly lighter on hover */
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: #0a0a0a; /* Corner between vertical and horizontal scrollbars */
+        }
         </style>
     </head>
     <body>
