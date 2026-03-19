@@ -255,6 +255,9 @@
         const qrShareBtn = document.getElementById('qrShareBtn');
         const urlParams = new URLSearchParams(window.location.search);
 
+        // load qrcode from url
+        if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
+
         // update qr code on input
         input.addEventListener('input', () => {updateQR(input, canvas)});
         updateQR(input, canvas);
@@ -262,9 +265,6 @@
         // toggle hidden state
         setHidden(input, toggleBtn, qrShareBtn, urlParams.get("hidden") == "true")
         toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn, qrShareBtn));
-
-        // load qrcode from url
-        if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
 
         // share button copies url into clipboard
         qrShareBtn.addEventListener('click', async () => {share_link(qrShareBtn, input.value)});
