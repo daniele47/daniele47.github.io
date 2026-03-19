@@ -35,7 +35,7 @@
 
         .input-row {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr auto auto;
             gap: 0.7rem;
             margin-bottom: 2.2rem;
             align-items: center;
@@ -61,7 +61,7 @@
             background: #223546;
         }
 
-        #toggleBtn {
+        .action-btn {
             background: #1f3b5c;
             border: 1px solid #3f5f88;
             color: #d9e9ff;
@@ -80,10 +80,21 @@
             line-height: 1;
         }
 
-        #toggleBtn:hover {
+        .action-btn:hover {
             background: #2a4b74;
             border-color: #5f8ec9;
             transform: scale(1.02);
+        }
+
+        #shareBtn {
+            background: #1f3b5c;
+            border-color: #3f5f88;
+            color: #d9e9ff;
+        }
+
+        #shareBtn:hover {
+            background: #2a4b74;
+            border-color: #5f8ec9;
         }
 
         #toggleBtn.hidden {
@@ -122,7 +133,8 @@
     <div class="frame">
         <div class="input-row">
             <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
-            <button id="toggleBtn">🚫</button>
+            <button class="action-btn" id="shareBtn">🔗</button>
+            <button class="action-btn" id="toggleBtn">🚫</button>
         </div>
         <div class="qr-area">
             <canvas id="qrCanvas"></canvas>
@@ -134,6 +146,7 @@
 
     <!-- utils -->
     <script>
+        // update qr code
         function updateQR(input, canvas) {
             let text = input.value;
             try {
@@ -165,6 +178,7 @@
                 ctx.stroke();
             }
         }
+        // set hidden state
         function updateURLParameter(key, value) {
             const url = new URL(window.location);
             url.searchParams.set(key, value);
@@ -184,6 +198,39 @@
         function toggleHidden(input, toggleBtn) {
             setHidden(input, toggleBtn, input.type == "text")
         }
+        // share button
+        async function share_link(shareBtn, qrcode) {
+            shareBtn.disabled = true;
+            const shared_url = `${window.location.host}${window.location.pathname}?qrcode=${encodeURIComponent(qrcode)}`
+            try {
+                await navigator.clipboard.writeText(shared_url);
+                // Visual feedback
+                const originalText = shareBtn.textContent;
+                shareBtn.textContent = '✓';
+                shareBtn.style.background = '#1f4a3b';
+                shareBtn.style.borderColor = '#2f8a6b';
+                setTimeout(() => {
+                    shareBtn.textContent = originalText;
+                    shareBtn.style.background = '#1f3b5c';
+                    shareBtn.style.borderColor = '#3f5f88';
+                    shareBtn.disabled = false;
+                    shareBtn.style.opacity = '1';
+                }, 1000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                const originalText = shareBtn.textContent;
+                shareBtn.textContent = '✗';
+                shareBtn.style.background = '#b55a5a';
+                shareBtn.style.borderColor = '#ff6b6b';
+                setTimeout(() => {
+                    shareBtn.textContent = originalText;
+                    shareBtn.style.background = '#1f3b5c';
+                    shareBtn.style.borderColor = '#3f5f88';
+                    shareBtn.disabled = false;
+                    shareBtn.style.opacity = '1';
+                }, 1000);
+            }
+        }
     </script>
 
     <!-- main -->
@@ -191,6 +238,7 @@
         const input = document.getElementById('qrInput');
         const canvas = document.getElementById('qrCanvas');
         const toggleBtn = document.getElementById('toggleBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const urlParams = new URLSearchParams(window.location.search);
 
         // update qr code on input
@@ -203,6 +251,9 @@
 
         // load qrcode from url
         if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
+
+        // share button copies url into clipboard
+        shareBtn.addEventListener('click', async () => {share_link(shareBtn, input.value)});
     </script>
 </body>
 
