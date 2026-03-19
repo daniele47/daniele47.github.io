@@ -86,13 +86,13 @@
             transform: scale(1.02);
         }
 
-        #shareBtn {
+        #qrShareBtn {
             background: #1f3b5c;
             border-color: #3f5f88;
             color: #d9e9ff;
         }
 
-        #shareBtn:hover {
+        #qrShareBtn:hover {
             background: #2a4b74;
             border-color: #5f8ec9;
         }
@@ -133,7 +133,7 @@
     <div class="frame">
         <div class="input-row">
             <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
-            <button class="action-btn" id="shareBtn">🔗</button>
+            <button class="action-btn" id="qrShareBtn">🔗</button>
             <button class="action-btn" id="toggleBtn">🚫</button>
         </div>
         <div class="qr-area">
@@ -199,35 +199,35 @@
             setHidden(input, toggleBtn, input.type == "text")
         }
         // share button
-        async function share_link(shareBtn, qrcode) {
-            shareBtn.disabled = true;
+        async function share_link(qrShareBtn, qrcode) {
+            qrShareBtn.disabled = true;
             const shared_url = `${window.location.host}${window.location.pathname}?qrcode=${encodeURIComponent(qrcode)}`
             try {
                 await navigator.clipboard.writeText(shared_url);
                 // Visual feedback
-                const originalText = shareBtn.textContent;
-                shareBtn.textContent = '✓';
-                shareBtn.style.background = '#1f4a3b';
-                shareBtn.style.borderColor = '#2f8a6b';
+                const originalText = qrShareBtn.textContent;
+                qrShareBtn.textContent = '✓';
+                qrShareBtn.style.background = '#1f4a3b';
+                qrShareBtn.style.borderColor = '#2f8a6b';
                 setTimeout(() => {
-                    shareBtn.textContent = originalText;
-                    shareBtn.style.background = '#1f3b5c';
-                    shareBtn.style.borderColor = '#3f5f88';
-                    shareBtn.disabled = false;
-                    shareBtn.style.opacity = '1';
+                    qrShareBtn.textContent = originalText;
+                    qrShareBtn.style.background = '#1f3b5c';
+                    qrShareBtn.style.borderColor = '#3f5f88';
+                    qrShareBtn.disabled = false;
+                    qrShareBtn.style.opacity = '1';
                 }, 1000);
             } catch (err) {
                 console.error('Failed to copy: ', err);
-                const originalText = shareBtn.textContent;
-                shareBtn.textContent = '✗';
-                shareBtn.style.background = '#b55a5a';
-                shareBtn.style.borderColor = '#ff6b6b';
+                const originalText = qrShareBtn.textContent;
+                qrShareBtn.textContent = '✗';
+                qrShareBtn.style.background = '#b55a5a';
+                qrShareBtn.style.borderColor = '#ff6b6b';
                 setTimeout(() => {
-                    shareBtn.textContent = originalText;
-                    shareBtn.style.background = '#1f3b5c';
-                    shareBtn.style.borderColor = '#3f5f88';
-                    shareBtn.disabled = false;
-                    shareBtn.style.opacity = '1';
+                    qrShareBtn.textContent = originalText;
+                    qrShareBtn.style.background = '#1f3b5c';
+                    qrShareBtn.style.borderColor = '#3f5f88';
+                    qrShareBtn.disabled = false;
+                    qrShareBtn.style.opacity = '1';
                 }, 1000);
             }
         }
@@ -238,7 +238,7 @@
         const input = document.getElementById('qrInput');
         const canvas = document.getElementById('qrCanvas');
         const toggleBtn = document.getElementById('toggleBtn');
-        const shareBtn = document.getElementById('shareBtn');
+        const qrShareBtn = document.getElementById('qrShareBtn');
         const urlParams = new URLSearchParams(window.location.search);
 
         // update qr code on input
@@ -253,7 +253,7 @@
         if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
 
         // share button copies url into clipboard
-        shareBtn.addEventListener('click', async () => {share_link(shareBtn, input.value)});
+        qrShareBtn.addEventListener('click', async () => {share_link(qrShareBtn, input.value)});
     </script>
 </body>
 
