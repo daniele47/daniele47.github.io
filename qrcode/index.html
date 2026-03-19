@@ -212,17 +212,17 @@
                     qrShareBtn.disabled = false;
                 } else {
                     await navigator.clipboard.writeText(shared_url);
-                    const originalText = qrShareBtn.textContent;
-                    qrShareBtn.textContent = '✓';
-                    qrShareBtn.style.background = '#1f4a3b';
-                    qrShareBtn.style.borderColor = '#2f8a6b';
-                    setTimeout(() => {
-                        qrShareBtn.textContent = originalText;
-                        qrShareBtn.style.background = '#1f3b5c';
-                        qrShareBtn.style.borderColor = '#3f5f88';
-                        qrShareBtn.disabled = false;
-                    }, 1000);
                 }
+                const originalText = qrShareBtn.textContent;
+                qrShareBtn.textContent = '✓';
+                qrShareBtn.style.background = '#1f4a3b';
+                qrShareBtn.style.borderColor = '#2f8a6b';
+                setTimeout(() => {
+                    qrShareBtn.textContent = originalText;
+                    qrShareBtn.style.background = '#1f3b5c';
+                    qrShareBtn.style.borderColor = '#3f5f88';
+                    qrShareBtn.disabled = false;
+                }, 1000);
             } catch (err) {
                 console.error('Share/copy failed: ', err);
                 const originalText = qrShareBtn.textContent;
