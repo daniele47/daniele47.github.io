@@ -114,7 +114,6 @@
             image-rendering: crisp-edges;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -128,6 +127,10 @@
         </div>
     </div>
 
+    <!-- libs -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
+    <!-- utils -->
     <script>
         function updateQR(input, canvas) {
             let text = input.value;
@@ -160,14 +163,30 @@
                 ctx.stroke();
             }
         }
-
-        const input = document.getElementById('qrInput');
-        const canvas = document.getElementById('qrCanvas');
-
-        input.addEventListener('input', () => {updateQR(input, canvas)});
-        updateQR(input, canvas);
+        function toggleHidden(input, toggleBtn) {
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.classList.remove('hidden');
+            } else {
+                input.type = 'password';
+                toggleBtn.classList.add('hidden');
+            }
+        }
     </script>
 
+    <!-- main -->
+    <script>
+        const input = document.getElementById('qrInput');
+        const canvas = document.getElementById('qrCanvas');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        // update qr code on input
+        input.addEventListener('input', () => {updateQR(input, canvas)});
+        updateQR(input, canvas);
+
+        // toggle hidden state
+        toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn));
+    </script>
 </body>
 
 </html>
