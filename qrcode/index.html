@@ -135,7 +135,7 @@
         function updateQR(input, canvas) {
             let text = input.value;
             try {
-                let qr = qrcode(0, 'H');
+                let qr = qrcode(0, 'L');
                 qr.addData(text);
                 qr.make();
                 let size = qr.getModuleCount() * 3;
