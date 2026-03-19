@@ -181,7 +181,11 @@
         // set hidden state
         function updateURLParameter(key, value) {
             const url = new URL(window.location);
-            url.searchParams.set(key, value);
+            if (typeof value !== 'string') {
+                url.searchParams.delete(key);
+            } else {
+                url.searchParams.set(key, value);
+            }
             window.history.replaceState({}, '', url);
         }
         function setHidden(input, toggleBtn, qrShareBtn, hide) {
@@ -257,6 +261,7 @@
 
         // load qrcode from url
         if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
+        updateURLParameter("qrcode", null)
 
         // update qr code on input
         input.addEventListener('input', () => {updateQR(input, canvas)});
