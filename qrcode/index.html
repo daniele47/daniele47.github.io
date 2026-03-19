@@ -184,21 +184,27 @@
             url.searchParams.set(key, value);
             window.history.replaceState({}, '', url);
         }
-        function setHidden(input, toggleBtn, hide) {
+        function setHidden(input, toggleBtn, qrShareBtn, hide) {
             if (!hide) {
                 input.type = 'text';
                 toggleBtn.classList.remove('hidden');
                 toggleBtn.innerText = "👁️";
+                qrShareBtn.disabled = false;
+                qrShareBtn.style.opacity = 1;
+                qrShareBtn.style.cursor = "pointer";
                 updateURLParameter('hidden', 'false');
             } else {
                 input.type = 'password';
                 toggleBtn.classList.add('hidden');
                 toggleBtn.innerText = "🚫";
+                qrShareBtn.disabled = true;
+                qrShareBtn.style.opacity = 0.25;
+                qrShareBtn.style.cursor = "default";
                 updateURLParameter('hidden', 'true');
             }
         }
-        function toggleHidden(input, toggleBtn) {
-            setHidden(input, toggleBtn, input.type == "text")
+        function toggleHidden(input, toggleBtn, qrShareBtn) {
+            setHidden(input, toggleBtn, qrShareBtn, input.type == "text")
         }
         // share button
         async function share_link(qrShareBtn, qrcode) {
@@ -254,8 +260,8 @@
         updateQR(input, canvas);
 
         // toggle hidden state
-        setHidden(input, toggleBtn, urlParams.get("hidden") == "true")
-        toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn));
+        setHidden(input, toggleBtn, qrShareBtn, urlParams.get("hidden") == "true")
+        toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn, qrShareBtn));
 
         // load qrcode from url
         if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
