@@ -200,6 +200,9 @@
         // toggle hidden state
         setHidden(input, toggleBtn, urlParams.get("hidden") == "true")
         toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn));
+
+        // load qrcode from url
+        if (urlParams.get("qrcode")) {input.value = urlParams.get("qrcode")}
     </script>
 </body>
 
