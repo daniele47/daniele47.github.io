@@ -134,7 +134,7 @@
         <div class="input-row">
             <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
             <button class="action-btn" id="qrShareBtn">🔗</button>
-            <button class="action-btn" id="toggleBtn">🚫</button>
+            <button class="action-btn" id="toggleBtn">👁️</button>
         </div>
         <div class="qr-area">
             <canvas id="qrCanvas"></canvas>
@@ -188,10 +188,12 @@
             if (!hide) {
                 input.type = 'text';
                 toggleBtn.classList.remove('hidden');
+                toggleBtn.innerText = "👁️";
                 updateURLParameter('hidden', 'false');
             } else {
                 input.type = 'password';
                 toggleBtn.classList.add('hidden');
+                toggleBtn.innerText = "🚫";
                 updateURLParameter('hidden', 'true');
             }
         }
