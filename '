@@ -170,8 +170,8 @@
             url.searchParams.set(key, value);
             window.history.replaceState({}, '', url);
         }
-        function setHidden(input, toggleBtn, hide) {
-            if (!hide) {
+        function toggleHidden(input, toggleBtn) {
+            if (input.type === 'password') {
                 input.type = 'text';
                 toggleBtn.classList.remove('hidden');
                 updateURLParameter('hidden', 'false');
@@ -181,9 +181,6 @@
                 updateURLParameter('hidden', 'true');
             }
         }
-        function toggleHidden(input, toggleBtn) {
-            setHidden(input, toggleBtn, input.type == "text")
-        }
     </script>
 
     <!-- main -->
@@ -191,14 +188,12 @@
         const input = document.getElementById('qrInput');
         const canvas = document.getElementById('qrCanvas');
         const toggleBtn = document.getElementById('toggleBtn');
-        const urlParams = new URLSearchParams(window.location.search);
 
         // update qr code on input
         input.addEventListener('input', () => {updateQR(input, canvas)});
         updateQR(input, canvas);
 
         // toggle hidden state
-        setHidden(input, toggleBtn, urlParams.get("hidden") == "true")
         toggleBtn.addEventListener('click', () => toggleHidden(input, toggleBtn));
     </script>
 </body>
