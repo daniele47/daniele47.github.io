@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dark · private qr</title>
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="./favicon.png" type="image/png">
+    <title>QR code</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
         body {
             background: #0c0f14;
             min-height: 100vh;
@@ -19,6 +23,7 @@
             font-family: system-ui, -apple-system, sans-serif;
             padding: 1.2rem;
         }
+
         .frame {
             background: #151e28;
             border-radius: 2.2rem;
@@ -27,12 +32,14 @@
             width: 100%;
             box-shadow: 0 25px 40px -10px black;
         }
+
         .input-row {
             display: flex;
             gap: 0.7rem;
             margin-bottom: 2.2rem;
             align-items: center;
         }
+
         #qrInput {
             flex: 1;
             background: #1e2a36;
@@ -46,10 +53,12 @@
             box-shadow: inset 0 3px 8px #0a0e14;
             font-family: 'SF Mono', 'Fira Code', monospace;
         }
+
         #qrInput:focus {
             border-color: #5f8ec9;
             background: #223546;
         }
+
         #toggleBtn {
             background: #1f3b5c;
             border: 1px solid #3f5f88;
@@ -68,17 +77,20 @@
             user-select: none;
             line-height: 1;
         }
+
         #toggleBtn:hover {
             background: #2a4b74;
             border-color: #5f8ec9;
             transform: scale(1.02);
         }
+
         #toggleBtn.hidden {
             background: #3d2a2a;
             border-color: #b55a5a;
             color: #ffb6b6;
             box-shadow: 0 0 0 1px #b55a5a inset;
         }
+
         .qr-area {
             display: flex;
             justify-content: center;
@@ -88,6 +100,7 @@
             padding: 1.8rem 1rem;
             border: 1px solid #26384f;
         }
+
         canvas {
             display: block;
             width: 100%;
@@ -96,24 +109,65 @@
             aspect-ratio: 1/1;
             background: white;
             padding: 0.9rem;
-            border-radius: 2rem;
+            border-radius: 0;
             box-shadow: 0 0 0 1px #2f537a, 0 20px 30px -12px black;
             image-rendering: crisp-edges;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
+
 <body>
-<div class="frame">
-    <div class="input-row">
-        <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
-        <div id="toggleBtn" title="hide/show" role="button" tabindex="0">🚫</div>
+    <div class="frame">
+        <div class="input-row">
+            <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
+            <div id="toggleBtn" title="hide/show" role="button" tabindex="0">🚫</div>
+        </div>
+        <div class="qr-area">
+            <canvas id="qrCanvas" width="380" height="380"></canvas>
+        </div>
     </div>
-    <div class="qr-area">
-        <canvas id="qrCanvas" width="380" height="380"></canvas>
-    </div>
-</div>
+
+    <script>
+        function updateQR(input, canvas) {
+            let text = input.value;
+            try {
+                let qr = qrcode(0, 'H');
+                qr.addData(text);
+                qr.make();
+                let size = qr.getModuleCount() * 3;
+                canvas.width = canvas.height = size;
+                let ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = '#000';
+                for (let row = 0; row < qr.getModuleCount(); row++) {
+                    for (let col = 0; col < qr.getModuleCount(); col++) {
+                        if (qr.isDark(row, col)) ctx.fillRect(col * 3, row * 3, 3, 3);
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+                let ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.moveTo(canvas.width, 0);
+                ctx.lineTo(0, canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        const input = document.getElementById('qrInput');
+        const canvas = document.getElementById('qrCanvas');
+
+        input.addEventListener('input', () => {updateQR(input, canvas)});
+        updateQR(input, canvas);
+    </script>
 
 </body>
-</html>
 
+</html>
