@@ -203,21 +203,28 @@
             qrShareBtn.disabled = true;
             const shared_url = `${window.location.host}${window.location.pathname}?qrcode=${encodeURIComponent(qrcode)}`
             try {
-                await navigator.clipboard.writeText(shared_url);
-                // Visual feedback
-                const originalText = qrShareBtn.textContent;
-                qrShareBtn.textContent = '✓';
-                qrShareBtn.style.background = '#1f4a3b';
-                qrShareBtn.style.borderColor = '#2f8a6b';
-                setTimeout(() => {
-                    qrShareBtn.textContent = originalText;
-                    qrShareBtn.style.background = '#1f3b5c';
-                    qrShareBtn.style.borderColor = '#3f5f88';
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'QR Code',
+                        text: 'Check out this QR code',
+                        url: shared_url
+                    });
                     qrShareBtn.disabled = false;
-                    qrShareBtn.style.opacity = '1';
-                }, 1000);
+                } else {
+                    await navigator.clipboard.writeText(shared_url);
+                    const originalText = qrShareBtn.textContent;
+                    qrShareBtn.textContent = '✓';
+                    qrShareBtn.style.background = '#1f4a3b';
+                    qrShareBtn.style.borderColor = '#2f8a6b';
+                    setTimeout(() => {
+                        qrShareBtn.textContent = originalText;
+                        qrShareBtn.style.background = '#1f3b5c';
+                        qrShareBtn.style.borderColor = '#3f5f88';
+                        qrShareBtn.disabled = false;
+                    }, 1000);
+                }
             } catch (err) {
-                console.error('Failed to copy: ', err);
+                console.error('Share/copy failed: ', err);
                 const originalText = qrShareBtn.textContent;
                 qrShareBtn.textContent = '✗';
                 qrShareBtn.style.background = '#b55a5a';
@@ -227,7 +234,6 @@
                     qrShareBtn.style.background = '#1f3b5c';
                     qrShareBtn.style.borderColor = '#3f5f88';
                     qrShareBtn.disabled = false;
-                    qrShareBtn.style.opacity = '1';
                 }, 1000);
             }
         }
