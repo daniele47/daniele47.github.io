@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dark · private qr</title>
     <style>
-        /* ---------- brutally minimal ---------- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -51,7 +50,6 @@
             border-color: #5f8ec9;
             background: #223546;
         }
-        /* minimal toggle: O with slash (red when hidden) */
         #toggleBtn {
             background: #1f3b5c;
             border: 1px solid #3f5f88;
@@ -75,7 +73,6 @@
             border-color: #5f8ec9;
             transform: scale(1.02);
         }
-        /* hidden mode: red slash */
         #toggleBtn.hidden {
             background: #3d2a2a;
             border-color: #b55a5a;
@@ -103,15 +100,13 @@
             box-shadow: 0 0 0 1px #2f537a, 0 20px 30px -12px black;
             image-rendering: crisp-edges;
         }
-        /* absolutely no placeholder text */
     </style>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 <div class="frame">
     <div class="input-row">
-        <!-- EMPTY. NO PLACEHOLDER. -->
-        <input type="text" id="qrInput" value="" spellcheck="false" autofocus>
+        <input type="text" id="qrInput" value="" spellcheck="false" autofocus placeholder="Enter QR code">
         <div id="toggleBtn" title="hide/show" role="button" tabindex="0">🚫</div>
     </div>
     <div class="qr-area">
@@ -119,199 +114,6 @@
     </div>
 </div>
 
-<script>
-    (function() {
-        const input = document.getElementById('qrInput');
-        const toggleBtn = document.getElementById('toggleBtn');
-        const canvas = document.getElementById('qrCanvas');
-        const qrlib = (typeof qrcode === 'function') ? qrcode : window.qrcode;
-
-        // hidden mode off by default
-        let hiddenMode = false;
-
-        // generate QR from current input value (raw, not masked)
-        function generateQR() {
-            let text = input.value;   // always the real value (input field holds raw when unmasked, masked when hidden)
-            // but careful: when hidden, input.value shows bullets, not raw.
-            // we need to store raw separately. Use a variable.
-            // let's rework: we store rawText independent of input.value.
-            // better approach: keep raw in a variable, sync with input on edits.
-        }
-
-        // We'll store the real text separately.
-        let rawText = input.value;   // starts empty
-
-        // sync input field based on mode
-        function syncInputField() {
-            if (hiddenMode) {
-                // show bullets (keep length)
-                input.value = '•'.repeat(rawText.length);
-                // add class to button for red styling
-                toggleBtn.classList.add('hidden');
-            } else {
-                // show real text
-                input.value = rawText;
-                toggleBtn.classList.remove('hidden');
-            }
-        }
-
-        // generate QR from rawText
-        function generateQR() {
-            let text = rawText;
-            if (text === '') {
-                text = ' ';   // single space (invisible but valid)
-            }
-            if (text.length > 600) text = text.slice(0, 600) + '…';
-
-            try {
-                const qr = qrlib(0, 'M');
-                qr.addData(text);
-                qr.make();
-
-                const modules = qr.getModuleCount();
-                const scale = 5;
-                const size = modules * scale;
-
-                canvas.width = size;
-                canvas.height = size;
-
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, size, size);
-                ctx.fillStyle = '#000000';
-
-                for (let row = 0; row < modules; row++) {
-                    for (let col = 0; col < modules; col++) {
-                        if (qr.isDark(row, col)) {
-                            ctx.fillRect(col * scale, row * scale, scale, scale);
-                        }
-                    }
-                }
-            } catch (e) {
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // handle input edits (only when not hidden)
-        input.addEventListener('input', function(e) {
-            if (!hiddenMode) {
-                // update raw from what user typed
-                rawText = input.value;
-                generateQR();
-            } else {
-                // when hidden, user is seeing bullets, but we want to allow editing.
-                // We need to interpret the change. The visible field shows bullets.
-                // We'll use the fact that the browser gives us the raw input event.
-                // But the input's value is bullets, so we can't get the actual character.
-                // Instead, we temporarily disable hidden mode? No.
-                // Better: use a hidden field? no.
-                // Solution: when hidden, we detach and use keydown? Too complex.
-                // Given the requirement: "when input is hidden, i cannot modify it. stop this bullshit."
-                // So we must allow editing even when hidden.
-                // The only way is to not mask the input field itself, but mask visually somehow?
-                // But the user wants to hide the text from shoulder surfers.
-                // We can keep the input as password field? That shows bullets but we lose raw.
-                // The correct approach: use an input with type="password" when hidden.
-                // That shows bullets natively, and we can still read the value.
-                // YES! That's perfect. type="password" shows bullets but the .value is raw.
-                // Let's switch to that.
-            }
-        });
-
-        // Rework using input type="text"/"password" toggle.
-        // Much simpler: when hidden, set type="password". When visible, type="text".
-        // No rawText needed — we use input.value directly.
-        // This is the clean solution.
-
-        // Reset everything:
-        // Remove all the rawText complexity. Use type switching.
-
-        // Set initial type to text (visible)
-        input.type = 'text';
-        hiddenMode = false;
-        toggleBtn.classList.remove('hidden');
-
-        function updateMode() {
-            if (hiddenMode) {
-                input.type = 'password';
-                toggleBtn.classList.add('hidden');
-            } else {
-                input.type = 'text';
-                toggleBtn.classList.remove('hidden');
-            }
-            // generate QR uses input.value directly (raw, no masking)
-            generateQR();
-        }
-
-        // generate QR directly from input.value
-        function generateQR() {
-            let text = input.value;
-            if (text === '') {
-                text = ' ';   // space to keep qr alive
-            }
-            if (text.length > 600) text = text.slice(0, 600) + '…';
-
-            try {
-                const qr = qrlib(0, 'M');
-                qr.addData(text);
-                qr.make();
-
-                const modules = qr.getModuleCount();
-                const scale = 5;
-                const size = modules * scale;
-
-                canvas.width = size;
-                canvas.height = size;
-
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, size, size);
-                ctx.fillStyle = '#000000';
-
-                for (let row = 0; row < modules; row++) {
-                    for (let col = 0; col < modules; col++) {
-                        if (qr.isDark(row, col)) {
-                            ctx.fillRect(col * scale, row * scale, scale, scale);
-                        }
-                    }
-                }
-            } catch (e) {
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // input event: any change updates qr (type=text or password, value is always raw)
-        input.addEventListener('input', generateQR);
-
-        // toggle click
-        toggleBtn.addEventListener('click', function() {
-            hiddenMode = !hiddenMode;
-            updateMode();
-            // keep cursor at end
-            input.focus();
-        });
-
-        // keyboard toggle
-        toggleBtn.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                hiddenMode = !hiddenMode;
-                updateMode();
-                input.focus();
-            }
-        });
-
-        // initial generation (input is empty, no placeholder)
-        generateQR();
-
-        // ensure no placeholder attribute (just in case)
-        input.removeAttribute('placeholder');
-    })();
-</script>
 </body>
 </html>
 
