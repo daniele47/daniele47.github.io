@@ -126,6 +126,39 @@
             box-shadow: 0 0 0 1px #2f537a, 0 20px 30px -12px black;
             image-rendering: crisp-edges;
         }
+
+        /* Print styles - only show QR code */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                display: block;
+            }
+
+            .frame {
+                background: white;
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+            }
+
+            .input-row {
+                display: none;
+            }
+
+            .qr-area {
+                background: white;
+                border: none;
+                padding: 0;
+            }
+
+            canvas {
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
