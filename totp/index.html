@@ -60,6 +60,10 @@
             word-break: break-all;
         }
 
+        .error {
+            color: #ff4444;
+        }
+
         .progress-bar-container {
             width: 100%;
             height: 6px;
@@ -133,6 +137,7 @@
         }
         function updateCodeAndTimer() {
             const rawInput = secretInput.value;
+            codeDiv.classList.remove('error');
             if (!rawInput) {
                 codeDiv.textContent = '——————';
                 timerContainer.classList.add('hidden');
@@ -155,6 +160,7 @@
                 timerContainer.classList.remove('hidden');
             } catch (e) {
                 codeDiv.textContent = 'ERROR';
+                codeDiv.classList.add('error');
                 timerContainer.classList.add('hidden');
             }
         }
