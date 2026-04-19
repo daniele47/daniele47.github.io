@@ -1,1 +1,3 @@
-the base logic for this code was taken from [jaden on github](https://github.com/jaden/totp-generator), just tweaked to my liking.
+# downloaded dependencies
+
+- https://cdn.jsdelivr.net/npm/otpauth@9.5.0/dist/otpauth.umd.min.js

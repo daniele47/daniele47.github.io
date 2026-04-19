@@ -1,96 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TOTP Generator</title>
-  <link rel="stylesheet" href="css/bulma-0.9.4.min.css">
-  <style>
-    [v-cloak] {
-      display: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html, body {
-      height: 100%;
-    }
+        body {
+            background-color: #0a0a0a;
+            font-family: system-ui, -apple-system, 'Segoe UI', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    body > footer {
-      position: sticky;
-      top: 100vh;
-    }
+        .container {
+            width: 500px;
+            padding: 2rem;
+        }
 
-    .footer {
-      padding: 2rem;
-    }
+        input[type="password"] {
+            width: 100%;
+            padding: 1rem;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1.5rem;
+        }
 
-    @media screen and (min-width: 1068px) {
-      .container {
-        max-width: 600px;
-        width: 600px;
-      }
-    }
-  </style>
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        .code {
+            font-size: 4rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #4a9eff;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background-color: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            background-color: #4a9eff;
+            transition: width 0.1s linear;
+        }
+
+        .seconds-text {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
-
-  <script defer src="js/assets/vue-3.4.20.global.prod.js"></script>
-  <script defer src="js/assets/otpauth-9.1.3.min.js"></script>
-  <script defer src="js/assets/clipboard-2.0.6.min.js"></script>
-  <script defer src="js/app.js?v=1.2"></script>
-
-  <section id="app" class="section" v-cloak>
-
     <div class="container">
-
-      <h1 class="title">TOTP Token Generator</h1>
-
-      <div class="field">
-        <label class="label is-uppercase">Your Secret Key</label>
-        <div class="control">
-          <input class="input" type="text" v-model="secret_key" placeholder="The secret key (in base-32 format)">
+        <input type="password" id="secret" placeholder="Paste TOTP Seed here" autocomplete="off" autofocus>
+        <div class="code" id="code">——————</div>
+        <div id="timerContainer" class="hidden">
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="seconds-text" id="secondsText"></div>
         </div>
-      </div>
-
-      <div class="field">
-        <label class="label is-uppercase">Number of Digits</label>
-        <div class="control">
-          <input class="input" type="text" v-model="digits" placeholder="Usually 6">
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label is-uppercase">Token Period (in seconds)</label>
-        <div class="control">
-          <input class="input" type="text" v-model="period" placeholder="Usually 30">
-        </div>
-      </div>
-
-      <div class="content">
-        <span class="has-text-grey is-size-7">Updating in {{ updatingIn }} seconds</span>
-        <progress class="progress is-info is-small" v-bind:value="updatingIn" :max="period"></progress>
-      </div>
-
-      <div class="box">
-        <p class="title is-size-1 has-text-centered" id="token">{{ token }}</p>
-      </div>
-
-      <div class="control is-clearfix">
-        <a class="button is-large is-light is-pulled-right" id="clipboard-button" data-clipboard-target="#token" title="Copy token to clipboard">
-          <img src="img/clippy.svg" height="36" width="36">
-        </a>
-      </div>
-
     </div>
 
-  </section>
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@latest/dist/otpauth.umd.min.js"></script>
+    <script>
+        const secretInput = document.getElementById('secret');
+        const codeDiv = document.getElementById('code');
+        const timerContainer = document.getElementById('timerContainer');
+        const progressFill = document.getElementById('progressFill');
+        const secondsText = document.getElementById('secondsText');
 
-  <footer class="footer">
-    <div class="container">
-      <div class="content has-text-centered">
-        Built by <a href="https://dan.hersam.com">Dan Hersam</a>. Source on <a href="https://github.com/jaden/totp-generator">Github</a>.
-      </div>
-    </div>
-  </footer>
+        let lastValidSecret = '';
 
+        function getTimeRemaining() {
+            const now = Date.now();
+            const period = 30000;
+            return period - (now % period);
+        }
+
+        function updateCodeAndTimer() {
+            const secret = secretInput.value.trim().toUpperCase().replace(/\s/g, '');
+
+            if (!secret) {
+                codeDiv.textContent = '——————';
+                timerContainer.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const totp = new OTPAuth.TOTP({
+                    secret: secret,
+                    digits: 6,
+                    period: 30,
+                    algorithm: 'SHA1'
+                });
+
+                codeDiv.textContent = totp.generate();
+                lastValidSecret = secret;
+
+                const remainingMs = getTimeRemaining();
+                const remainingSec = Math.ceil(remainingMs / 1000);
+                const progressPercent = (remainingMs / 30000) * 100;
+
+                progressFill.style.width = progressPercent + '%';
+                secondsText.textContent = `updating in ${remainingSec} second${remainingSec !== 1 ? 's' : ''}`;
+                timerContainer.classList.remove('hidden');
+            } catch (e) {
+                codeDiv.textContent = 'ERROR';
+                timerContainer.classList.add('hidden');
+            }
+        }
+
+        secretInput.addEventListener('input', updateCodeAndTimer);
+
+        // Update every second
+        setInterval(() => {
+            if (secretInput.value.trim()) {
+                try {
+                    const secret = secretInput.value.trim().toUpperCase().replace(/\s/g, '');
+                    if (secret) {
+                        new OTPAuth.TOTP({
+                            secret: secret,
+                            digits: 6,
+                            period: 30,
+                            algorithm: 'SHA1'
+                        });
+                        updateCodeAndTimer();
+                    }
+                } catch (e) {
+                    // Silent fail - error state already handled in updateCodeAndTimer
+                }
+            }
+        }, 100);
+    </script>
 </body>
+
 </html>
