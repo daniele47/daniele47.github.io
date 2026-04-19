@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <link rel="icon" href="./favicon.png" type="image/png">
-    <script src="https://cdn.jsdelivr.net/npm/otpauth@latest/dist/otpauth.umd.min.js"></script>
+    <script src="./js/otpauth.umd.min.js"></script>
     <title>Totp generator</title>
     <style>
         * {
@@ -29,7 +29,7 @@
             padding: 2rem;
         }
 
-        input[type="password"] {
+        input {
             width: 100%;
             padding: 1rem;
             background-color: #1e1e1e;
@@ -41,7 +41,7 @@
             margin-bottom: 1.5rem;
         }
 
-        input[type="password"]:focus {
+        input:focus {
             outline: none;
             border-color: #4a9eff;
         }
@@ -91,7 +91,7 @@
 
 <body>
     <div class="container">
-        <input type="password" id="secret" placeholder="Paste totp seed here..." autocomplete="off" autofocus>
+        <input type="text" id="secret" placeholder="Paste totp seed here..." autocomplete="off" autofocus>
         <div class="code" id="code">——————</div>
         <div id="timerContainer" class="hidden">
             <div class="progress-bar-container">
