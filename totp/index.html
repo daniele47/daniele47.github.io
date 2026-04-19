@@ -84,7 +84,8 @@
         }
 
         .hidden {
-            display: none;
+            display: hidden;
+            opacity: 0;
         }
     </style>
 </head>
@@ -102,15 +103,8 @@
     </div>
 
     <script>
-        const secretInput = document.getElementById('secret');
-        const codeDiv = document.getElementById('code');
-        const timerContainer = document.getElementById('timerContainer');
-        const progressFill = document.getElementById('progressFill');
-        const secondsText = document.getElementById('secondsText');
-
         function extractSecret(input) {
             input = input.trim();
-
             // Check if it's an otpauth:// URL
             if (input.startsWith('otpauth://')) {
                 try {
@@ -125,7 +119,6 @@
                     throw new Error('Invalid otpauth URL');
                 }
             }
-
             // Otherwise treat as raw secret
             return {
                 secret: input.toUpperCase().replace(/\s/g, ''),
@@ -134,38 +127,30 @@
                 period: 30
             };
         }
-
         function getTimeRemaining(period = 30) {
             const now = Date.now();
             const periodMs = period * 1000;
             return periodMs - (now % periodMs);
         }
-
         function updateCodeAndTimer() {
             const rawInput = secretInput.value;
-
             if (!rawInput) {
                 codeDiv.textContent = '——————';
                 timerContainer.classList.add('hidden');
                 return;
             }
-
             try {
                 const {secret, algorithm, digits, period} = extractSecret(rawInput);
-
                 const totp = new OTPAuth.TOTP({
                     secret: secret,
                     digits: digits,
                     period: period,
                     algorithm: algorithm
                 });
-
                 codeDiv.textContent = totp.generate();
-
                 const remainingMs = getTimeRemaining(period);
                 const remainingSec = Math.ceil(remainingMs / 1000);
                 const progressPercent = (remainingMs / (period * 1000)) * 100;
-
                 progressFill.style.width = progressPercent + '%';
                 secondsText.textContent = `updating in ${remainingSec} second${remainingSec !== 1 ? 's' : ''}`;
                 timerContainer.classList.remove('hidden');
@@ -174,9 +159,16 @@
                 timerContainer.classList.add('hidden');
             }
         }
+    </script>
+
+    <script>
+        const secretInput = document.getElementById('secret');
+        const codeDiv = document.getElementById('code');
+        const timerContainer = document.getElementById('timerContainer');
+        const progressFill = document.getElementById('progressFill');
+        const secondsText = document.getElementById('secondsText');
 
         secretInput.addEventListener('input', updateCodeAndTimer);
-
         setInterval(() => {
             if (secretInput.value.trim()) {
                 updateCodeAndTimer();
