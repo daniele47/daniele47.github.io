@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOTP</title>
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="./favicon.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@latest/dist/otpauth.umd.min.js"></script>
+    <title>Totp generator</title>
     <style>
         * {
             margin: 0;
@@ -88,7 +91,7 @@
 
 <body>
     <div class="container">
-        <input type="password" id="secret" placeholder="Paste TOTP Seed here" autocomplete="off" autofocus>
+        <input type="password" id="secret" placeholder="Paste totp seed here..." autocomplete="off" autofocus>
         <div class="code" id="code">——————</div>
         <div id="timerContainer" class="hidden">
             <div class="progress-bar-container">
@@ -98,7 +101,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/otpauth@latest/dist/otpauth.umd.min.js"></script>
     <script>
         const secretInput = document.getElementById('secret');
         const codeDiv = document.getElementById('code');
@@ -106,37 +108,63 @@
         const progressFill = document.getElementById('progressFill');
         const secondsText = document.getElementById('secondsText');
 
-        let lastValidSecret = '';
+        function extractSecret(input) {
+            input = input.trim();
 
-        function getTimeRemaining() {
+            // Check if it's an otpauth:// URL
+            if (input.startsWith('otpauth://')) {
+                try {
+                    const parsed = OTPAuth.URI.parse(input);
+                    return {
+                        secret: parsed.secret.base32,
+                        algorithm: parsed.algorithm,
+                        digits: parsed.digits,
+                        period: parsed.period
+                    };
+                } catch (e) {
+                    throw new Error('Invalid otpauth URL');
+                }
+            }
+
+            // Otherwise treat as raw secret
+            return {
+                secret: input.toUpperCase().replace(/\s/g, ''),
+                algorithm: 'SHA1',
+                digits: 6,
+                period: 30
+            };
+        }
+
+        function getTimeRemaining(period = 30) {
             const now = Date.now();
-            const period = 30000;
-            return period - (now % period);
+            const periodMs = period * 1000;
+            return periodMs - (now % periodMs);
         }
 
         function updateCodeAndTimer() {
-            const secret = secretInput.value.trim().toUpperCase().replace(/\s/g, '');
+            const rawInput = secretInput.value;
 
-            if (!secret) {
+            if (!rawInput) {
                 codeDiv.textContent = '——————';
                 timerContainer.classList.add('hidden');
                 return;
             }
 
             try {
+                const {secret, algorithm, digits, period} = extractSecret(rawInput);
+
                 const totp = new OTPAuth.TOTP({
                     secret: secret,
-                    digits: 6,
-                    period: 30,
-                    algorithm: 'SHA1'
+                    digits: digits,
+                    period: period,
+                    algorithm: algorithm
                 });
 
                 codeDiv.textContent = totp.generate();
-                lastValidSecret = secret;
 
-                const remainingMs = getTimeRemaining();
+                const remainingMs = getTimeRemaining(period);
                 const remainingSec = Math.ceil(remainingMs / 1000);
-                const progressPercent = (remainingMs / 30000) * 100;
+                const progressPercent = (remainingMs / (period * 1000)) * 100;
 
                 progressFill.style.width = progressPercent + '%';
                 secondsText.textContent = `updating in ${remainingSec} second${remainingSec !== 1 ? 's' : ''}`;
@@ -149,25 +177,11 @@
 
         secretInput.addEventListener('input', updateCodeAndTimer);
 
-        // Update every second
         setInterval(() => {
             if (secretInput.value.trim()) {
-                try {
-                    const secret = secretInput.value.trim().toUpperCase().replace(/\s/g, '');
-                    if (secret) {
-                        new OTPAuth.TOTP({
-                            secret: secret,
-                            digits: 6,
-                            period: 30,
-                            algorithm: 'SHA1'
-                        });
-                        updateCodeAndTimer();
-                    }
-                } catch (e) {
-                    // Silent fail - error state already handled in updateCodeAndTimer
-                }
+                updateCodeAndTimer();
             }
-        }, 100);
+        }, 1000);
     </script>
 </body>
 
